@@ -4,7 +4,7 @@
 import { ethers } from "ethers";
 
 // Contract addresses and ABI
-const EXAM_STAKING_ADDRESS = "0xa147C9A89f50771A89dD421A614A8570f765a20E";
+const EXAM_STAKING_ADDRESS = process.env.EXAM_STAKING_ADDRESS || "0x45E8E7F39cf0Dc903B7471C80e8AC61dab283B9A"; // Flow EVM
 const VERIFIER_REGISTRY_ADDRESS = "0xea9DA664E4282B0ca32C14c154B28850d7b1bf51";
 
 const EXAM_ABI = [
@@ -16,9 +16,9 @@ const VERIFIER_ABI = [
   "function isVerifier(address verifier) external view returns (bool)"
 ];
 
-// Environment setup
-const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
-const wallet = new ethers.Wallet(process.env.SEPOLIA_PRIVATE_KEY, provider);
+// Environment setup (Flow EVM Testnet)
+const provider = new ethers.JsonRpcProvider(process.env.FLOW_EVM_TESTNET_RPC_URL || "https://testnet.evm.nodes.onflow.org");
+const wallet = new ethers.Wallet(process.env.FLOW_EVM_PRIVATE_KEY, provider);
 
 // Enhanced exam creation endpoint
 export const createExamWithBlockchain = async (req, res) => {
@@ -173,8 +173,8 @@ export const getExamWithBlockchainInfo = async (req, res) => {
           finalized,
           canceled,
           feeBps: Number(feeBps),
-          totalStake: ethers.formatUnits(totalStake, 6),
-          protocolFee: ethers.formatUnits(protocolFee, 6),
+          totalStake: ethers.formatUnits(totalStake, 18), // FLOW has 18 decimals
+          protocolFee: ethers.formatUnits(protocolFee, 18), // FLOW has 18 decimals
           candidates: candidates.length,
           stakingOpen
         };

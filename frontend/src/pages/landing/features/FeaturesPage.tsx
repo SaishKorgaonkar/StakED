@@ -32,7 +32,7 @@
                   <p className="text-lg font-bold text-gray-800">
                     Put your skills where your stake is. 
                     <br />
-                    Back yourself or classmates with PYUSD tokens.
+                    Back yourself or classmates with FLOW tokens.
                   </p>
                 </CardContent>
               </Card>

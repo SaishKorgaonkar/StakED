@@ -160,7 +160,7 @@ const IntegratedCreateExam: React.FC = () => {
               Create New Exam with Blockchain Staking
             </h1>
             <p className="font-mono text-gray-600 mt-1 mb-6">
-              Create exam with integrated PYUSD staking for students
+              Create exam with integrated FLOW staking for students
             </p>
           </div>
 
@@ -325,9 +325,9 @@ const IntegratedCreateExam: React.FC = () => {
             <CardContent>
               <div className="space-y-3 text-sm">
                 <div className="bg-blue-50 p-3 rounded">
-                  <p className="font-medium text-blue-800">PYUSD Staking System</p>
+                  <p className="font-medium text-blue-800">FLOW Staking System</p>
                   <ul className="list-disc list-inside text-blue-700 space-y-1 mt-1">
-                    <li>Students stake PYUSD on themselves or others</li>
+                    <li>Students stake FLOW on themselves or others</li>
                     <li>Automatic reward distribution after grading</li>
                     <li>2.5% protocol fee on stakes</li>
                   </ul>
@@ -355,7 +355,7 @@ const IntegratedCreateExam: React.FC = () => {
             <CardContent>
               <div className="space-y-2 text-xs">
                 <p><strong>Network:</strong> Sepolia Testnet</p>
-                <p><strong>PYUSD:</strong> 0xCaC5...bB9</p>
+                <p><strong>FLOW:</strong> 0x0000...0000</p>
                 <p><strong>ExamStaking:</strong> 0x183d...ce9 (Multi-verifier)</p>
                 <p><strong>Protocol Fee:</strong> 2.5%</p>
                 <p className="text-green-600 font-bold">✅ Any verifier can grade any exam</p>

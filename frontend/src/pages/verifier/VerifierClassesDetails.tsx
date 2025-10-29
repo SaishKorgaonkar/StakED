@@ -10,6 +10,7 @@ import { ArrowLeft, Calendar, Clock, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -251,6 +252,9 @@ const VerifierClassesDetails = () => {
                   <DialogTitle className="text-xl sm:text-2xl font-black text-center uppercase">
                     Create New Exam
                   </DialogTitle>
+                  <DialogDescription className="text-center text-gray-600">
+                    Create a new exam for your students to participate in
+                  </DialogDescription>
                 </DialogHeader>
 
                 <div className="mt-6 space-y-4">

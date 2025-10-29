@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wallet, AlertCircle } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { CONTRACT_ADDRESSES } from "@/lib/web3Utils";
-import { useNotification } from "../../hooks/useNotification";
 
 interface IntegratedStakeDialogProps {
   isOpen: boolean;
@@ -30,21 +30,14 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
   candidateAddress,
   candidateName
 }) => {
-  const { notify } = useNotification();
   const [amount, setAmount] = useState("");
   const [predictedMarks, setPredictedMarks] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
-  const [balance, setBalance] = useState("0");
-  const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"connect" | "stake" | "approve" | "confirm">("connect");
+  const [balance, setBalance] = useState<string>("0");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [step, setStep] = useState<"connect" | "stake" | "confirm">("connect");
 
-  useEffect(() => {
-    if (isOpen) {
-      checkWalletConnection();
-    }
-  }, [isOpen]);
-
-  const checkWalletConnection = async () => {
+  const checkWalletConnection = useCallback(async () => {
     try {
       if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
@@ -56,24 +49,105 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
           setWalletAddress(address);
           setStep("stake");
 
-          await getPyusdBalance(address, provider);
+          await getFlowBalance(address, provider);
         }
       }
     } catch (error) {
       console.error("Wallet connection check failed:", error);
     }
-  };
+  }, []);
 
-  const getPyusdBalance = async (address: string, provider: ethers.BrowserProvider) => {
+  useEffect(() => {
+    if (isOpen) {
+      checkWalletConnection();
+    }
+
+    // Listen for network changes
+    const handleChainChanged = async (chainId: string) => {
+      console.log("Network changed to:", parseInt(chainId, 16));
+      
+      // If user switched to Flow EVM Testnet, update balance
+      if (parseInt(chainId, 16) === 545 && walletAddress) {
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          await getFlowBalance(walletAddress, provider);
+          console.log("✅ Network switched to Flow EVM Testnet - balance updated!");
+        } catch (error) {
+          console.error("Failed to update balance after network change:", error);
+        }
+      } else if (parseInt(chainId, 16) !== 545) {
+        // Not on Flow EVM Testnet
+        setBalance("0");
+        console.log("⚠️ Not on Flow EVM Testnet - balance set to 0");
+      }
+    };
+
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', handleChainChanged);
+    }
+
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      }
+    };
+  }, [isOpen, walletAddress, checkWalletConnection]);
+
+  const addFlowEVMNetwork = async () => {
     try {
-      const PYUSD_ADDRESS = CONTRACT_ADDRESSES.PYUSD_ADDRESS;
-      const PYUSD_ABI = ["function balanceOf(address account) external view returns (uint256)"];
+      if (!window.ethereum) {
+        alert("MetaMask is not installed!");
+        return;
+      }
 
-      const contract = new ethers.Contract(PYUSD_ADDRESS, PYUSD_ABI, provider);
-      const balanceWei = await contract.balanceOf(address);
-      setBalance(ethers.formatUnits(balanceWei, 6));
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x221', // 545 in hex
+          chainName: 'Flow EVM Testnet',
+          nativeCurrency: {
+            name: 'FLOW',
+            symbol: 'FLOW',
+            decimals: 18
+          },
+          rpcUrls: ['https://testnet.evm.nodes.onflow.org'],
+          blockExplorerUrls: ['https://evm-testnet.flowscan.org']
+        }]
+      });
+
+      console.log("✅ Flow EVM Testnet network added to MetaMask!");
+      // After adding, try to check wallet connection again
+      await checkWalletConnection();
     } catch (error) {
-      console.error("Failed to get PYUSD balance:", error);
+      console.error("❌ Failed to add Flow EVM Testnet:", error);
+    }
+  };
+  const getFlowBalance = async (address: string, provider: ethers.BrowserProvider) => {
+    try {
+      // Check if we're on the correct network first
+      const network = await provider.getNetwork();
+      console.log("Current network:", network.chainId.toString(), network.name);
+      
+      if (network.chainId !== 545n) {
+        console.warn("❌ Wrong network! Expected Flow EVM Testnet (545), got:", network.chainId.toString());
+        console.log("🔧 Please manually switch to Flow EVM Testnet in MetaMask:");
+        console.log("   - Network Name: Flow EVM Testnet");
+        console.log("   - RPC URL: https://testnet.evm.nodes.onflow.org");
+        console.log("   - Chain ID: 545");
+        console.log("   - Currency Symbol: FLOW");
+        setBalance("0");
+        return;
+      }
+
+      console.log("✅ Correct network detected! Fetching native FLOW balance...");
+      
+      // Use native FLOW balance instead of ERC20
+      const balanceWei = await provider.getBalance(address);
+      const balanceFormatted = ethers.formatEther(balanceWei); // FLOW has 18 decimals
+      console.log("✅ Native FLOW balance fetched:", balanceFormatted, "FLOW");
+      setBalance(balanceFormatted);
+    } catch (error) {
+      console.error("❌ Failed to get FLOW balance:", error);
       setBalance("0");
     }
   };
@@ -88,16 +162,31 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
 
+      // Check network before proceeding
+      const network = await provider.getNetwork();
+      console.log("Wallet connected to network:", network.chainId.toString());
+      
+      // Notify user if not on correct network
+      if (network.chainId !== 545n) {
+        console.log("⚠️ Wrong network detected. Please manually switch to Flow EVM Testnet (Chain ID: 545) in MetaMask");
+      }
+
       const signer = await provider.getSigner();
       const address = await signer.getAddress();
 
       setWalletAddress(address);
       setStep("stake");
 
-      await getPyusdBalance(address, provider);
+      // Only get balance if we're on the correct network
+      if (network.chainId === 545n) {
+        await getFlowBalance(address, provider);
+      } else {
+        setBalance("0");
+        console.log("Not on Flow EVM Testnet - balance set to 0");
+      }
 
       // No transaction hash for wallet connection - we'll skip notification here
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Wallet connection failed:", error);
     } finally {
       setLoading(false);
@@ -113,7 +202,7 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
       const signer = await provider.getSigner();
 
       const EXAM_ABI = [
-        "function stake(bytes32 examId, address candidate, uint256 amount, uint256 predictedScore) external"
+        "function stake(bytes32 examId, address candidate, uint256 predictedScore) external payable"
       ];
 
       const response = await fetch(`${API_BASE}/exams/stake`, {
@@ -137,32 +226,29 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
 
       const examContract = new ethers.Contract(data.blockchain.contractAddress, EXAM_ABI, signer);
       const examIdBytes = ethers.keccak256(ethers.toUtf8Bytes(data.blockchain.examId));
-      const stakeAmountWei = ethers.parseUnits(amount, 6);
+      const stakeAmountWei = ethers.parseEther(amount); // Use 18 decimals for native FLOW
       const predictedScoreInt = Math.floor(parseFloat(predictedMarks));
 
-      const stakeTx = await examContract.stake(examIdBytes, candidateAddress || walletAddress, stakeAmountWei, predictedScoreInt);
-      notify({
-        txHash: stakeTx.hash
-      });
+      // Call stake function with native FLOW (send value with transaction)
+      const stakeTx = await examContract.stake(
+        examIdBytes, 
+        candidateAddress || walletAddress, 
+        predictedScoreInt,
+        { value: stakeAmountWei } // Send FLOW with the transaction
+      );
+      
+      console.log("✅ Staking transaction sent:", stakeTx.hash);
 
       const receipt = await stakeTx.wait();
-      notify({
-        txHash: receipt.hash
-      });
+      console.log("✅ Staking transaction confirmed:", receipt.hash);
 
-      await getPyusdBalance(walletAddress, provider);
+      await getFlowBalance(walletAddress, provider);
 
       onSuccess();
       onClose();
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Staking error:", error);
-      // Show failed transaction in explorer if we have a hash
-      if (error.transaction?.hash) {
-        notify({
-          txHash: error.transaction.hash
-        });
-      }
       setStep("stake");
     } finally {
       setLoading(false);
@@ -182,14 +268,20 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
 
     const stakeAmount = parseFloat(amount);
     if (stakeAmount > parseFloat(balance)) {
-      console.error("Insufficient PYUSD balance");
+      console.error("Insufficient FLOW balance");
       return;
     }
 
     setLoading(true);
-    setStep("approve");
-
+    
     try {
+      console.log("🔍 DEBUG: About to send stake request:");
+      console.log("  - examId:", examId);
+      console.log("  - candidateAddress:", candidateAddress || walletAddress);
+      console.log("  - amount:", amount);
+      console.log("  - predictedMarks (raw):", predictedMarks);
+      console.log("  - predictedMarks (parsed):", parseFloat(predictedMarks));
+
       // Start the stake process
       const response = await fetch(`${API_BASE}/exams/stake`, {
         method: 'POST',
@@ -217,60 +309,40 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
       const provider = new ethers.BrowserProvider(window.ethereum!);
       const signer = await provider.getSigner();
 
-      const PYUSD_ADDRESS = CONTRACT_ADDRESSES.PYUSD_ADDRESS;
       const EXAM_STAKING_ADDRESS = CONTRACT_ADDRESSES.EXAM_STAKING_ADDRESS;
 
-      const PYUSD_ABI = [
-        "function approve(address spender, uint256 amount) external returns (bool)",
-        "function allowance(address owner, address spender) external view returns (uint256)"
-      ];
-
+      // Native FLOW - no approval needed, just send value with transaction
       const EXAM_ABI = [
-        "function stake(bytes32 examId, address candidate, uint256 amount, uint256 predictedScore) external"
+        "function stake(bytes32 examId, address candidate, uint256 predictedScore) external payable"
       ];
-
-      const pyusdContract = new ethers.Contract(PYUSD_ADDRESS, PYUSD_ABI, signer);
-      const allowance = await pyusdContract.allowance(walletAddress, EXAM_STAKING_ADDRESS);
-      const stakeAmountWei = ethers.parseUnits(stakeAmount.toString(), 6);
-
-      if (allowance < stakeAmountWei) {
-        const approveTx = await pyusdContract.approve(EXAM_STAKING_ADDRESS, stakeAmountWei);
-        notify({
-          txHash: approveTx.hash
-        });
-        await approveTx.wait();
-      }
 
       const examContract = new ethers.Contract(EXAM_STAKING_ADDRESS, EXAM_ABI, signer);
       const examIdBytes = ethers.keccak256(ethers.toUtf8Bytes(data.blockchain.examId));
       const predictedScoreInt = Math.floor(parseFloat(predictedMarks));
+      const stakeAmountWei = ethers.parseEther(stakeAmount.toString()); // FLOW has 18 decimals
 
-      const stakeTx = await examContract.stake(examIdBytes, candidateAddress || walletAddress, stakeAmountWei, predictedScoreInt);
-      notify({
-        txHash: stakeTx.hash
-      });
+      // Send native FLOW with the transaction
+      const stakeTx = await examContract.stake(
+        examIdBytes, 
+        candidateAddress || walletAddress, 
+        predictedScoreInt,
+        { value: stakeAmountWei } // Send FLOW as native currency
+      );
+      
+      console.log("✅ Staking transaction sent:", stakeTx.hash);
 
       const stakeTxReceipt = await stakeTx.wait();
-      notify({
-        txHash: stakeTxReceipt.hash
-      });
+      console.log("✅ Staking transaction confirmed:", stakeTxReceipt.hash);
 
       // Update balance after successful stake
-      await getPyusdBalance(walletAddress, provider);
+      await getFlowBalance(walletAddress, provider);
 
       onSuccess();
       onClose();
 
-      setStep("confirm");
-
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Staking error:", error);
-      // Show failed transaction in explorer if we have a hash
-      if (error.transaction?.hash) {
-        notify({
-          txHash: error.transaction.hash
-        });
-      }
+      setStep("stake");
       setStep("stake");
     } finally {
       setLoading(false);
@@ -294,7 +366,7 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
               <Wallet className="w-16 h-16 text-blue-500 mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Connect Your Wallet</h3>
               <p className="text-gray-600 mb-4">
-                Connect your MetaMask wallet to stake PYUSD
+                Connect your MetaMask wallet to stake FLOW
               </p>
               <Button
                 onClick={connectWallet}
@@ -319,8 +391,8 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
 
             <div className="bg-gray-50 p-3 rounded-lg">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Your PYUSD Balance:</span>
-                <span className="font-semibold">{parseFloat(balance).toFixed(2)} PYUSD</span>
+                <span className="text-sm text-gray-600">Your FLOW Balance:</span>
+                <span className="font-semibold">{parseFloat(balance).toFixed(4)} FLOW</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Connected Wallet:</span>
@@ -328,11 +400,25 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
                   {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                 </span>
               </div>
+              {parseFloat(balance) === 0 && (
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-800 font-medium mb-2">⚠️ Wrong Network Detected</p>
+                  <p className="text-xs text-yellow-700 mb-2">
+                    Please switch to Flow EVM Testnet to see your FLOW balance and stake tokens.
+                  </p>
+                  <Button
+                    onClick={addFlowEVMNetwork}
+                    className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white py-1"
+                  >
+                    Add Flow EVM Testnet to MetaMask
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">Stake Amount (PYUSD)
-                <img src="/images/pyusd.png" alt="PYUSD" className="w-4 h-4" /></Label>
+              <Label htmlFor="amount">Stake Amount (FLOW)
+                <img src="/images/flow-logo.png" alt="FLOW" className="w-4 h-4 inline ml-1" /></Label>
               <div className="relative">
                 <Input
                   id="amount"
@@ -390,24 +476,8 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
                 disabled={loading || !amount || parseFloat(amount) <= 0 || !predictedMarks || parseFloat(predictedMarks) < 40 || parseFloat(predictedMarks) > 100}
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
               >
-                {loading ? "Processing..." : "Stake PYUSD"}
+                {loading ? "Processing..." : "Stake FLOW"}
               </Button>
-            </div>
-          </div>
-        );
-
-      case "approve":
-        return (
-          <div className="space-y-4 text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
-              <AlertCircle className="w-8 h-8 text-yellow-600" />
-            </div>
-            <h3 className="text-lg font-semibold">Approval Required</h3>
-            <p className="text-gray-600">
-              Please approve PYUSD spending in your wallet
-            </p>
-            <div className="animate-pulse">
-              <div className="h-2 bg-gray-200 rounded"></div>
             </div>
           </div>
         );
@@ -416,14 +486,14 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
         return (
           <div className="space-y-4 text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-              <img src="/images/pyusd.png" alt="PYUSD" className="w-12 h-12" />
+              <img src="/images/flow-logo.png" alt="FLOW" className="w-12 h-12" />
             </div>
             <h3 className="text-lg font-semibold">Confirm Stake</h3>
             <p className="text-gray-600">
               Confirm the staking transaction in your wallet
             </p>
             <div className="bg-gray-50 p-3 rounded-lg space-y-2">
-              <p className="font-semibold">{amount} PYUSD → {candidateName}</p>
+              <p className="font-semibold">{amount} FLOW → {candidateName}</p>
               <p className="text-sm text-gray-600">Predicted Score: {predictedMarks}%</p>
             </div>
             <div className="space-y-3">
@@ -454,7 +524,10 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Stake PYUSD</DialogTitle>
+          <DialogTitle>Stake FLOW</DialogTitle>
+          <DialogDescription>
+            Stake your FLOW tokens for this exam to participate in the prediction market.
+          </DialogDescription>
         </DialogHeader>
         {renderContent()}
       </DialogContent>

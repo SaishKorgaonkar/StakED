@@ -18,7 +18,7 @@ const WalletConnection: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const [pyusdBalance, setPyusdBalance] = useState<string>("0");
+  const [flowBalance, setFlowBalance] = useState<string>("0");
 
   useEffect(() => {
     fetchUserInfo();
@@ -54,7 +54,7 @@ const WalletConnection: React.FC = () => {
           setConnectedAddress(address);
           setIsConnected(true);
           
-          await getPyusdBalance(address, provider);
+          await getFlowBalance(address, provider);
         }
       }
     } catch (error) {
@@ -62,17 +62,14 @@ const WalletConnection: React.FC = () => {
     }
   };
 
-  const getPyusdBalance = async (address: string, provider: ethers.BrowserProvider) => {
+  const getFlowBalance = async (address: string, provider: ethers.BrowserProvider) => {
     try {
-      const PYUSD_ADDRESS = "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9";
-      const PYUSD_ABI = ["function balanceOf(address account) external view returns (uint256)"];
-      
-      const contract = new ethers.Contract(PYUSD_ADDRESS, PYUSD_ABI, provider);
-      const balanceWei = await contract.balanceOf(address);
-      setPyusdBalance(ethers.formatUnits(balanceWei, 6));
+      // FLOW is the native token on Flow EVM, so we get the native balance (like ETH)
+      const balanceWei = await provider.getBalance(address);
+      setFlowBalance(ethers.formatUnits(balanceWei, 18)); // FLOW has 18 decimals
     } catch (error) {
-      console.error("Failed to get PYUSD balance:", error);
-      setPyusdBalance("0");
+      console.error("Failed to get FLOW balance:", error);
+      setFlowBalance("0");
     }
   };
 
@@ -91,14 +88,14 @@ const WalletConnection: React.FC = () => {
       const address = await signer.getAddress();
       
       const network = await provider.getNetwork();
-      if (network.chainId !== 11155111n) { 
-        throw new Error("Please switch to Sepolia testnet in MetaMask");
+      if (network.chainId !== 545n) { // Flow EVM Testnet
+        throw new Error("Please switch to Flow EVM Testnet in MetaMask (Chain ID: 545)");
       }
       
       setConnectedAddress(address);
       setIsConnected(true);
       
-      await getPyusdBalance(address, provider);
+      await getFlowBalance(address, provider);
       
       alert("✅ Wallet connected successfully!\nYou can now update your profile with this wallet address.");
       
@@ -132,7 +129,7 @@ const WalletConnection: React.FC = () => {
       
       if (data.success) {
         setUser(prev => prev ? { ...prev, walletAddress: connectedAddress.toLowerCase() } : null);
-        alert("✅ Wallet address updated successfully!\nYou can now participate in PYUSD staking.");
+        alert("✅ Wallet address updated successfully!\nYou can now participate in FLOW staking.");
       } else {
         throw new Error(data.message);
       }
@@ -167,7 +164,7 @@ const WalletConnection: React.FC = () => {
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Wallet Connection</h1>
-        <p className="text-gray-600">Connect your MetaMask wallet to participate in PYUSD staking</p>
+        <p className="text-gray-600">Connect your MetaMask wallet to participate in FLOW staking</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -220,7 +217,7 @@ const WalletConnection: React.FC = () => {
                   </Button>
                 </div>
                 <p className="text-sm text-gray-600 mt-1">
-                  PYUSD Balance: <strong>{parseFloat(pyusdBalance).toFixed(2)} PYUSD</strong>
+                  FLOW Balance: <strong>{parseFloat(flowBalance).toFixed(4)} FLOW</strong>
                 </p>
               </div>
             )}
@@ -240,7 +237,7 @@ const WalletConnection: React.FC = () => {
                 <div>
                   <h3 className="font-semibold mb-2">Connect MetaMask</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Connect your MetaMask wallet to participate in PYUSD staking on exams
+                    Connect your MetaMask wallet to participate in FLOW staking on exams
                   </p>
                   <Button 
                     onClick={connectWallet}
@@ -259,7 +256,7 @@ const WalletConnection: React.FC = () => {
                     <span className="font-semibold text-green-800">Wallet Connected</span>
                   </div>
                   <p className="text-sm text-green-700">
-                    Network: Sepolia Testnet ✓
+                    Network: Flow EVM Testnet ✓
                   </p>
                 </div>
 
@@ -276,7 +273,7 @@ const WalletConnection: React.FC = () => {
                 {walletStatus.status === "connected" && (
                   <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      ✅ You're all set! Your wallet is connected and saved. You can now participate in PYUSD staking on exams.
+                      ✅ You're all set! Your wallet is connected and saved. You can now participate in FLOW staking on exams.
                     </p>
                   </div>
                 )}
@@ -289,28 +286,33 @@ const WalletConnection: React.FC = () => {
       {/* Instructions */}
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>How to Get PYUSD for Testing</CardTitle>
+          <CardTitle>How to Get FLOW for Testing</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="font-semibold mb-2">Step 1: Get Sepolia ETH</h4>
               <p className="text-sm text-gray-600 mb-2">
-                You need Sepolia ETH for gas fees. Get it from:
+                You need Flow EVM testnet FLOW tokens for gas fees and staking. Get them from:
               </p>
               <ul className="text-sm space-y-1">
-                <li>• <a href="https://sepoliafaucet.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Sepolia Faucet</a></li>
-                <li>• <a href="https://faucets.chain.link/sepolia" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Chainlink Faucet</a></li>
+                <li>• <a href="https://testnet-faucet.onflow.org/fund-account" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Flow Testnet Faucet</a></li>
+                <li>• Ask in Flow Discord for testnet FLOW tokens</li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-2">Step 2: Get PYUSD</h4>
+              <h4 className="font-semibold mb-2">Step 2: Add Flow EVM Testnet</h4>
               <p className="text-sm text-gray-600 mb-2">
-                PYUSD Contract: <code className="bg-gray-100 px-1 rounded">0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9</code>
+                Network Details:
               </p>
-              <p className="text-sm text-gray-600">
-                Add this token to MetaMask or get test PYUSD from the deployer.
+              <ul className="text-sm space-y-1">
+                <li>• <strong>Chain ID:</strong> 545</li>
+                <li>• <strong>RPC URL:</strong> https://testnet.evm.nodes.onflow.org</li>
+                <li>• <strong>Currency:</strong> FLOW</li>
+              </ul>
+              <p className="text-sm text-gray-600 mt-2">
+                FLOW is the native token - no contract address needed!
               </p>
             </div>
           </div>

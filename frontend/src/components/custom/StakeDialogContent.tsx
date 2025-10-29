@@ -99,7 +99,7 @@ const StakeDialogContent: React.FC<StakeDialogContentProps> = ({
         
         <div>
           <label className="block text-sm font-bold text-gray-700 mb-2">
-            Amount to Stake (PYUSD)
+            Amount to Stake (FLOW)
           </label>
           <input
             type="number"

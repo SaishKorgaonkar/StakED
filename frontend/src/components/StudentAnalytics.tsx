@@ -56,7 +56,7 @@ const MetricCard = ({
 
 export function StudentAnalytics({
   userAddress,
-  chainId = "11155111",
+  chainId = "545", // Flow EVM Testnet
   refreshTrigger,
 }: StudentAnalyticsProps) {
   const { metrics, isLoading } = useAnalytics(

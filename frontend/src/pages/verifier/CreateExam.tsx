@@ -333,7 +333,7 @@ const CreateExam: React.FC = () => {
             </h3>
             <div className="space-y-2 text-sm">
               <p><strong>Network:</strong> Sepolia Testnet</p>
-              <p><strong>PYUSD Token:</strong> 0xCaC5...bB9</p>
+              <p><strong>FLOW Token:</strong> 0x0000...0000</p>
               <p><strong>Protocol Fee:</strong> 2.5%</p>
               <p className="text-blue-600 font-bold">🔗 Blockchain activated when first student stakes</p>
               <p className="text-green-600 font-bold">✅ Any verifier can grade any exam</p>
@@ -346,7 +346,7 @@ const CreateExam: React.FC = () => {
             <div className="space-y-2 text-sm">
               <p>1. <strong>Create Exam:</strong> Normal exam creation (fast)</p>
               <p>2. <strong>First Stake:</strong> Blockchain automatically initialized</p>
-              <p>3. <strong>Students Stake:</strong> PYUSD with predicted marks</p>
+              <p>3. <strong>Students Stake:</strong> FLOW with predicted marks</p>
               <p>4. <strong>Grade & Reward:</strong> Automatic distribution based on performance</p>
             </div>
           </div>

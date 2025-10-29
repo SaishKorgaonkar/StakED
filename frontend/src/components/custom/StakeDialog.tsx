@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
@@ -22,10 +23,10 @@ interface StakeDialogProps {
   examId?: string;
 }
 
-const PYUSD_ADDRESS = "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9"; 
-const EXAM_STAKING_ADDRESS = "0x1E4731390cce9955BC21985BB45068A1858703C2"; 
+const FLOW_TOKEN_ADDRESS = "0x0000000000000000000000010000000000000000"; // Native FLOW token
+const EXAM_STAKING_ADDRESS = "0x45E8E7F39cf0Dc903B7471C80e8AC61dab283B9A"; // Updated for Flow EVM
 
-const PYUSD_ABI = [
+const FLOW_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
   "function allowance(address owner, address spender) external view returns (uint256)",
   "function balanceOf(address account) external view returns (uint256)",
@@ -52,7 +53,7 @@ export default function StakeDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState("");
-  const [pyusdBalance, setPyusdBalance] = useState("0");
+  const [flowBalance, setFlowBalance] = useState("0");
 
   const connectWallet = async () => {
     try {
@@ -69,10 +70,9 @@ export default function StakeDialog({
       setUserAddress(address);
       setWalletConnected(true);
 
-      const pyusdContract = new ethers.Contract(PYUSD_ADDRESS, PYUSD_ABI, provider);
-      const balance = await pyusdContract.balanceOf(address);
-      const decimals = await pyusdContract.decimals();
-      setPyusdBalance(ethers.formatUnits(balance, decimals));
+      // Get FLOW balance using native balance (not ERC20 contract)
+      const balance = await provider.getBalance(address);
+      setFlowBalance(ethers.formatUnits(balance, 18)); // FLOW has 18 decimals
     } catch (error: any) {
       console.error("Wallet connection failed:", error);
     }
@@ -94,21 +94,25 @@ export default function StakeDialog({
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      const stakeAmount = ethers.parseUnits(amount, 6);
+      const stakeAmount = ethers.parseUnits(amount, 18); // FLOW has 18 decimals
       
-      const pyusdContract = new ethers.Contract(PYUSD_ADDRESS, PYUSD_ABI, signer);
-      const balance = await pyusdContract.balanceOf(userAddress);
+      // For native FLOW, check balance directly from provider
+      const balance = await provider.getBalance(userAddress);
       
       if (balance < stakeAmount) {
-        console.error("Insufficient PYUSD balance");
+        console.error("Insufficient FLOW balance");
         return;
       }
 
-      const currentAllowance = await pyusdContract.allowance(userAddress, EXAM_STAKING_ADDRESS);
-      
-      if (currentAllowance < stakeAmount) {
-        const approveTx = await pyusdContract.approve(EXAM_STAKING_ADDRESS, stakeAmount);
-        const approveTxReceipt = await approveTx.wait();
+      // Native FLOW doesn't need approval, send with transaction
+      const stakingContract = new ethers.Contract(EXAM_STAKING_ADDRESS, EXAM_STAKING_ABI, signer);
+      const stakeTx = await stakingContract.stake(
+        targetId, 
+        targetId, 
+        stakeAmount, 
+        ethers.parseUnits(predictedScore, 0),
+        { value: stakeAmount } // Send FLOW as native value
+      );
         notify({
           txHash: approveTxReceipt.hash
         });
@@ -159,7 +163,7 @@ export default function StakeDialog({
     setIsLoading(false);
     setWalletConnected(false);
     setUserAddress("");
-    setPyusdBalance("0");
+    setFlowBalance("0");
   };
 
   const handleClose = () => {
@@ -173,8 +177,11 @@ export default function StakeDialog({
         <DialogHeader>
           <DialogTitle className="text-xl font-black text-center uppercase flex items-center justify-center gap-2">
             <DollarSign className="w-6 h-6 text-green-600" />
-            Stake PYUSD
+            Stake FLOW
           </DialogTitle>
+          <DialogDescription className="text-center text-gray-600">
+            Place your FLOW tokens stake and predict the outcome
+          </DialogDescription>
         </DialogHeader>
 
         <div className="mt-6 space-y-4">
@@ -211,7 +218,7 @@ export default function StakeDialog({
                   {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
                 </p>
                 <p className="text-sm font-semibold text-green-800 mt-1">
-                  PYUSD Balance: {parseFloat(pyusdBalance).toFixed(2)}
+                  FLOW Balance: {parseFloat(flowBalance).toFixed(2)}
                 </p>
               </div>
 
