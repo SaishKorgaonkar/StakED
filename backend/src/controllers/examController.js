@@ -8,27 +8,30 @@ import Stake from "../models/Stake.js";
 // Configure dotenv to ensure environment variables are loaded
 dotenv.config();
 
-// Contract configuration (Updated with prediction-based logic)
-const CONTRACTS = {
-  EXAM_STAKING: process.env.EXAM_STAKING_ADDRESS || "0xa147C9A89f50771A89dD421A614A8570f765a20E",
-  PYUSD: process.env.PYUSD_ADDRESS || "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9",
-  STUDENT_REGISTRY: process.env.STUDENT_REGISTRY_ADDRESS || "0xF13330A8af65533793011d4d20Dd68bA1e8fe24a",
-  VERIFIER_REGISTRY: process.env.VERIFIER_REGISTRY_ADDRESS || "0x1903613D43Feb8266af88Fc67004103480cd86A2"
+// Contract configuration (Updated for Flow EVM Testnet - DEPLOYED!)
+// Flow EVM Contract Addresses (Updated with native FLOW - Proper checksums)
+const CONTRACT_ADDRESSES = {
+  EXAM_STAKING: process.env.EXAM_STAKING_ADDRESS || "0xEBE5a5Db823873CC209aF9FF717A0203e02F907F",
+  STUDENT_REGISTRY: process.env.STUDENT_REGISTRY_ADDRESS || "0xA8821F82012E467A8dD2362FE26F0d4A2F4B5D46",
+  VERIFIER_REGISTRY: process.env.VERIFIER_REGISTRY_ADDRESS || "0x63611Dd7ddFFFeD346EBE23af118F941Be8E2142",
+  // Legacy
+  PYUSD: process.env.PYUSD_ADDRESS || "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9", // Legacy
 };
+
+const CONTRACTS = CONTRACT_ADDRESSES; // Alias for easier reference
 
 console.log("🔧 Contract Addresses Loaded:");
 console.log("  EXAM_STAKING:", CONTRACTS.EXAM_STAKING);
-console.log("  PYUSD:", CONTRACTS.PYUSD);
 console.log("  STUDENT_REGISTRY:", CONTRACTS.STUDENT_REGISTRY);
 console.log("  VERIFIER_REGISTRY:", CONTRACTS.VERIFIER_REGISTRY);
 
 const STAKED_BANK_ADDRESS = "0x6D41680267986408E5e7c175Ee0622cA931859A4";
 
-// Contract ABIs
+// Contract ABIs (Updated for native FLOW)
 const EXAM_ABI = [
   "function createExam(bytes32 examId, address verifier, address[] candidates, uint64 stakeDeadline, uint16 feeBps) external",
   "function getExam(bytes32 examId) external view returns (address verifier, uint64 stakeDeadline, bool finalized, bool canceled, uint16 feeBps, uint256 totalStake, uint256 protocolFee, address[] memory candidates)",
-  "function stake(bytes32 examId, address candidate, uint256 amount, uint256 predictedScore) external",
+  "function stake(bytes32 examId, address candidate, uint256 predictedScore) external payable",
   "function stakeOf(bytes32 examId, address staker, address candidate) external view returns (uint256)",
   "function totalOn(bytes32 examId, address candidate) external view returns (uint256)",
   "function setStudentScores(bytes32 examId, address[] students, uint256[] scores) external",
@@ -51,14 +54,15 @@ const STUDENT_ABI = [
   "function isRegistered(address student) external view returns (bool)"
 ];
 
-// Blockchain provider setup (with fallback for development)
+// Blockchain provider setup (Flow EVM Testnet)
 let provider, wallet;
 try {
-  if (process.env.SEPOLIA_RPC_URL && process.env.SEPOLIA_PRIVATE_KEY) {
-    provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
-    wallet = new ethers.Wallet(process.env.SEPOLIA_PRIVATE_KEY, provider);
+  if (process.env.FLOW_EVM_TESTNET_RPC_URL && process.env.FLOW_EVM_PRIVATE_KEY) {
+    provider = new ethers.JsonRpcProvider(process.env.FLOW_EVM_TESTNET_RPC_URL);
+    wallet = new ethers.Wallet(process.env.FLOW_EVM_PRIVATE_KEY, provider);
+    console.log("🌊 Connected to Flow EVM Testnet");
   } else {
-    console.warn("⚠️ Blockchain environment variables not set. Some features will be disabled.");
+    console.warn("⚠️ Flow EVM environment variables not set. Some features will be disabled.");
     provider = null;
     wallet = null;
   }
@@ -142,47 +146,61 @@ const initializeBlockchainForExam = async (exam) => {
     throw new Error("Blockchain provider not configured");
   }
 
-  // Get class and verifier details
-  const classDetails = await Class.findById(exam.classId).populate('students');
-  const verifier = await User.findById(exam.verifier);
+  try {
+    // Get class and verifier details
+    const classDetails = await Class.findById(exam.classId).populate('students');
+    const verifier = await User.findById(exam.verifier);
 
-  if (!verifier || !verifier.walletAddress) {
-    throw new Error("Verifier wallet address not found");
-  }
+    if (!verifier || !verifier.walletAddress) {
+      throw new Error("Verifier wallet address not found");
+    }
 
-  // Ensure verifier is registered
-  const verifierRegistry = new ethers.Contract(CONTRACTS.VERIFIER_REGISTRY, VERIFIER_ABI, wallet);
-  const isVerifierRegistered = await verifierRegistry.isVerifier(verifier.walletAddress);
-  
-  if (!isVerifierRegistered) {
-    console.log("📝 Registering verifier on blockchain...");
-    const registerTx = await verifierRegistry.addVerifier(verifier.walletAddress);
-    await registerTx.wait();
-    console.log("✅ Verifier registered");
-  }
-  
-  // Also ensure deployer wallet is registered as verifier (needed to create exams)
-  const deployerIsVerifier = await verifierRegistry.isVerifier(wallet.address);
-  if (!deployerIsVerifier) {
-    console.log("📝 Registering deployer as verifier...");
-    const registerDeployerTx = await verifierRegistry.addVerifier(wallet.address);
-    await registerDeployerTx.wait();
-    console.log("✅ Deployer registered as verifier");
-  }
+    // Ensure all contract addresses are properly checksummed
+    const examStakingAddress = ethers.getAddress(CONTRACTS.EXAM_STAKING);
+    const verifierRegistryAddress = ethers.getAddress(CONTRACTS.VERIFIER_REGISTRY);
+    const studentRegistryAddress = ethers.getAddress(CONTRACTS.STUDENT_REGISTRY);
 
-  // Register students and collect candidate addresses
-  const studentRegistry = new ethers.Contract(CONTRACTS.STUDENT_REGISTRY, STUDENT_ABI, wallet);
-  const candidateAddresses = [];
+    console.log("📋 Using contract addresses:");
+    console.log("  - ExamStaking:", examStakingAddress);
+    console.log("  - VerifierRegistry:", verifierRegistryAddress);
+    console.log("  - StudentRegistry:", studentRegistryAddress);
+
+    // Ensure verifier is registered
+    const verifierRegistry = new ethers.Contract(verifierRegistryAddress, VERIFIER_ABI, wallet);
+    const verifierAddress = ethers.getAddress(verifier.walletAddress);
+    const isVerifierRegistered = await verifierRegistry.isVerifier(verifierAddress);
+    
+    if (!isVerifierRegistered) {
+      console.log("📝 Registering verifier on blockchain...");
+      const registerTx = await verifierRegistry.addVerifier(verifierAddress);
+      await registerTx.wait();
+      console.log("✅ Verifier registered");
+    }
+    
+    // Also ensure deployer wallet is registered as verifier (needed to create exams)
+    const deployerAddress = ethers.getAddress(wallet.address);
+    const deployerIsVerifier = await verifierRegistry.isVerifier(deployerAddress);
+    if (!deployerIsVerifier) {
+      console.log("📝 Registering deployer as verifier...");
+      const registerDeployerTx = await verifierRegistry.addVerifier(deployerAddress);
+      await registerDeployerTx.wait();
+      console.log("✅ Deployer registered as verifier");
+    }
+
+    // Register students and collect candidate addresses
+    const studentRegistry = new ethers.Contract(studentRegistryAddress, STUDENT_ABI, wallet);
+    const candidateAddresses = [];
   
   for (const student of classDetails.students) {
     if (student.walletAddress) {
-      const isRegistered = await studentRegistry.isRegistered(student.walletAddress);
+      const studentAddress = ethers.getAddress(student.walletAddress);
+      const isRegistered = await studentRegistry.isRegistered(studentAddress);
       if (!isRegistered) {
-        console.log(`📝 Registering student ${student.walletAddress}...`);
-        const registerTx = await studentRegistry.registerStudent(student.walletAddress);
+        console.log(`📝 Registering student ${studentAddress}...`);
+        const registerTx = await studentRegistry.registerStudent(studentAddress);
         await registerTx.wait();
       }
-      candidateAddresses.push(student.walletAddress);
+      candidateAddresses.push(studentAddress);
     }
   }
 
@@ -191,15 +209,19 @@ const initializeBlockchainForExam = async (exam) => {
   }
 
   // Create exam on blockchain
-  const examContract = new ethers.Contract(CONTRACTS.EXAM_STAKING, EXAM_ABI, wallet);
+  const examContract = new ethers.Contract(examStakingAddress, EXAM_ABI, wallet);
   const examIdBytes = ethers.keccak256(ethers.toUtf8Bytes(exam.blockchainExamId));
   const stakeDeadlineTimestamp = Math.floor(exam.stakeDeadline.getTime() / 1000);
   const feeBps = 250; // 2.5%
 
   console.log("🔗 Creating exam on blockchain...");
+  console.log("  - Verifier:", verifierAddress);
+  console.log("  - Candidates:", candidateAddresses.length);
+  console.log("  - Deadline:", new Date(stakeDeadlineTimestamp * 1000));
+  
   const createTx = await examContract.createExam(
     examIdBytes,
-    verifier.walletAddress,
+    verifierAddress,
     candidateAddresses,
     stakeDeadlineTimestamp,
     feeBps
@@ -214,6 +236,11 @@ const initializeBlockchainForExam = async (exam) => {
 
   console.log(`✅ Blockchain initialized for exam: ${exam.name}`);
   return { candidateAddresses, contractAddress: CONTRACTS.EXAM_STAKING };
+  
+  } catch (error) {
+    console.error("❌ Blockchain initialization error:", error);
+    throw error;
+  }
 };
 
 // 2. Student Staking
@@ -398,7 +425,7 @@ export const stakeOnStudent = async (req, res) => {
       blockchain: {
         examId: exam.blockchainExamId,
         contractAddress: CONTRACTS.EXAM_STAKING,
-        pyusdAddress: CONTRACTS.PYUSD,
+        flowTokenAddress: CONTRACTS.FLOW_TOKEN,
         candidateAddress,
         amount: amount,
         predictedScore: predictedMarks
@@ -452,8 +479,8 @@ export const getExamInfo = async (req, res) => {
           finalized,
           canceled,
           feeBps: Number(feeBps),
-          totalStake: ethers.formatUnits(totalStake, 6),
-          protocolFee: ethers.formatUnits(protocolFee, 6),
+          totalStake: ethers.formatUnits(totalStake, 18), // FLOW has 18 decimals
+          protocolFee: ethers.formatUnits(protocolFee, 18), // FLOW has 18 decimals
           candidates,
           stakingOpen
         };
@@ -466,7 +493,7 @@ export const getExamInfo = async (req, res) => {
           stakes.push({
             candidateAddress: candidate,
             candidateName: candidateUser?.username || "Unknown",
-            totalStaked: ethers.formatUnits(totalOnCandidate, 6),
+            totalStaked: ethers.formatUnits(totalOnCandidate, 18), // FLOW has 18 decimals
             isWinner: finalized ? await examContract.isWinner(examIdBytes, candidate) : null,
             score: finalized ? await examContract.getStudentScore(examIdBytes, candidate) : null
           });

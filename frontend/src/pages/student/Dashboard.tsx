@@ -53,7 +53,7 @@ interface GroupedClaimableExam {
 
 export default function StudentDashboard() {
   const [userWalletAddress, setUserWalletAddress] = useState<string>("");
-  const [chainId] = useState<string>("11155111"); 
+  const [chainId] = useState<string>("545"); // Flow EVM Testnet
   const [classes, setClasses] = useState<Class[]>([]);
   const [claimableStakes, setClaimableStakes] = useState<ClaimableStake[]>([]);
   const [groupedClaimableExams, setGroupedClaimableExams] = useState<GroupedClaimableExam[]>([]);
@@ -347,7 +347,7 @@ export default function StudentDashboard() {
                     ✅ Reward Claimed Successfully!
                   </h2>
                   <p className="font-mono text-green-700">
-                    Your PYUSD has been transferred to your wallet
+                    Your FLOW has been transferred to your wallet
                   </p>
                 </div>
               </div>
@@ -382,13 +382,13 @@ export default function StudentDashboard() {
                       </p>
                       <p className="text-xs text-gray-500 font-mono">
                         {examGroup.stakeCount} stake{examGroup.stakeCount !== 1 ? 's' : ''} | 
-                        Total Staked: {examGroup.totalStakeAmount} PYUSD | 
-                        Total Reward: {examGroup.totalRewardAmount} PYUSD
+                        Total Staked: {examGroup.totalStakeAmount} FLOW | 
+                        Total Reward: {examGroup.totalRewardAmount} FLOW
                       </p>
                       <div className="mt-2 space-y-1">
                         {examGroup.stakes.map((stake, index) => (
                           <p key={stake._id} className="text-xs text-gray-400 font-mono">
-                            #{index + 1}: {stake.predictedMarks}/{examGroup.maxMarks} predicted → {stake.actualMarks}/{examGroup.maxMarks} actual (Staked: {stake.stakeAmount} PYUSD)
+                            #{index + 1}: {stake.predictedMarks}/{examGroup.maxMarks} predicted → {stake.actualMarks}/{examGroup.maxMarks} actual (Staked: {stake.stakeAmount} FLOW)
                           </p>
                         ))}
                       </div>
@@ -396,7 +396,7 @@ export default function StudentDashboard() {
                     <div className="text-right ml-4">
                       <div className="mb-2">
                         <span className="text-2xl font-black text-green-600">
-                          +{examGroup.totalRewardAmount} PYUSD
+                          +{examGroup.totalRewardAmount} FLOW
                         </span>
                       </div>
                       <button
@@ -414,7 +414,7 @@ export default function StudentDashboard() {
               <div className="mt-4 p-3 bg-blue-50 border-2 border-blue-300">
                 <p className="text-xs text-blue-800 font-bold">
                   💡 All your stakes for each exam are claimed together in a single transaction. 
-                  Rewards are paid in PYUSD directly to your connected wallet.
+                  Rewards are paid in FLOW directly to your connected wallet.
                 </p>
               </div>
             </div>

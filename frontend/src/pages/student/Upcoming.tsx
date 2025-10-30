@@ -5,6 +5,8 @@ import { useAnalytics } from "../../hooks/useAnalytics";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogTitle,
 } from "@/components/ui/dialog";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
@@ -360,6 +362,12 @@ export default function UpcomingTestsDashboard() {
         <DialogContent className="w-[95vw] max-w-2xl bg-white border-4 border-black shadow-[12px_12px_0px_#000000] rounded-none p-6">
           {selectedExam && (
             <>
+              <DialogTitle className="sr-only">
+                {selectedExam.name} - Exam Details
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                View detailed information about this exam and stake FLOW tokens
+              </DialogDescription>
               <div className="mb-6">
                 <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
                   {selectedExam.name}

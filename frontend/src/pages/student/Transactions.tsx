@@ -117,7 +117,7 @@ export default function TransactionPage() {
         if (data.status === "1") {
           const formattedTxs: RecentTransaction[] = data.result.slice(0, 5).map((tx: any) => ({
             hash: tx.hash,
-            type: tx.input === "0x" ? "PYUSD Transfer" : "Contract Interaction",
+            type: tx.input === "0x" ? "FLOW Transfer" : "Contract Interaction",
             timestamp: `${Math.floor((Date.now() - parseInt(tx.timeStamp) * 1000) / (60 * 60 * 1000))}h ago`,
             method: tx.input !== "0x" ? getMethodName(tx.input) : undefined,
             contractAddress: tx.to,
@@ -151,7 +151,7 @@ export default function TransactionPage() {
       return (
         <>
           Approved <span className="font-bold text-blue-600">T</span> for trade on{" "}
-          <span className="font-bold text-blue-600">PYUSD</span> {formatAddress(tx.to)}
+          <span className="font-bold text-blue-600">FLOW</span> {formatAddress(tx.to)}
         </>
       );
     }
@@ -247,10 +247,10 @@ export default function TransactionPage() {
                           Exam
                         </th>
                         <th className="border-b-2 border-black px-4 py-3 text-left font-extrabold uppercase tracking-wider text-gray-800">
-                          Stake (PYUSD)
+                          Stake (FLOW)
                         </th>
                         <th className="border-b-2 border-black px-4 py-3 text-left font-extrabold uppercase tracking-wider text-gray-800">
-                          Reward (PYUSD)
+                          Reward (FLOW)
                         </th>
                         <th className="border-b-2 border-black px-4 py-3 text-left font-extrabold uppercase tracking-wider text-gray-800">
                           Status
@@ -293,20 +293,16 @@ export default function TransactionPage() {
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg font-bold text-gray-800">
-                                {txn.stakeAmount}
-                              </span>
-                              <img src="/images/pyusd.png" alt="PYUSD" className="w-5 h-5" />
+                          <td className="px-4 py-4 border-b border-gray-200">
+                            <div className="flex items-center space-x-2">
+                              <img src="/images/flow-logo.png" alt="FLOW" className="w-5 h-5" />
+                              <span>{stake.amount} FLOW</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <div className={`flex items-center gap-2 ${txn.rewardAmount > 0 ? "text-green-600" : "text-gray-500"}`}>
-                              <span className="text-lg font-bold">
-                                {txn.rewardAmount}
-                              </span>
-                              <img src="/images/pyusd.png" alt="PYUSD" className="w-5 h-5" />
+                          <td className="px-4 py-4 border-b border-gray-200">
+                            <div className="flex items-center space-x-2">
+                              <img src="/images/flow-logo.png" alt="FLOW" className="w-5 h-5" />
+                              <span>{txn.reward} FLOW</span>
                             </div>
                           </td>
                           <td className="px-4 py-3 font-bold">

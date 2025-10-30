@@ -5,6 +5,7 @@ import { Trophy, Medal, Award } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -410,6 +411,9 @@ const Classmates = () => {
             <DialogTitle className="text-xl font-bold">
               Select Exam to Stake On
             </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Choose an exam to place your FLOW token stake
+            </DialogDescription>
           </DialogHeader>
           
           {availableExams.length === 0 ? (
