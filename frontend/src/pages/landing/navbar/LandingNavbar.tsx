@@ -69,7 +69,7 @@ export default function LandingNavbar() {
         </div>
 
         <Button
-          className="hidden md:flex bg-[#00A2FF] text-white border-4 border-black font-bold uppercase rounded-md hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer"
+          className="hidden md:flex bg-[#00EF8B] text-white border-4 border-black font-bold uppercase rounded-md hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer"
           onClick={handleVerifierLogin}
           disabled={loading}
         >

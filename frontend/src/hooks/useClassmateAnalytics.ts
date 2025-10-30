@@ -197,11 +197,11 @@ export function useClassmateAnalytics(walletAddresses: string[]) {
 
             results[walletAddress] = {
               walletAddress,
-              totalStaked: `${formattedStaked.toFixed(2)} PYUSD`,
+              totalStaked: `${formattedStaked.toFixed(2)} FLOW`,
               totalStakesWon: won,
               totalStakesLost: lost,
               winRate: Math.round(winRate),
-              totalEarnings: `${formattedEarnings >= 0 ? "+" : ""}${formattedEarnings.toFixed(2)} PYUSD`,
+              totalEarnings: `${formattedEarnings >= 0 ? "+" : ""}${formattedEarnings.toFixed(2)} FLOW`,
               totalEarningsValue: formattedEarnings,
               winRateHistory: winRateHistory,
             };

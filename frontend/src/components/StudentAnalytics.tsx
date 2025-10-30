@@ -1,10 +1,8 @@
-import { useTransactionPopup } from "@blockscout/app-sdk";
-import { Button } from "./ui/button";
+// import { useTransactionPopup } from "@blockscout/app-sdk";
 import { CircleLoader } from "./ui/circle-loader";
 import { useAnalytics } from "../hooks/useAnalytics";
-import { Wallet, Award, BookOpen, TrendingUp, History } from "lucide-react";
+import { Wallet, Award, BookOpen, TrendingUp } from "lucide-react";
 import WinRateChart from "./custom/WinRateChart";
-import BlockscoutLogo from "/images/BlockScoutLogo.png";
 
 interface MetricCardProps {
   label: string;
@@ -64,7 +62,6 @@ export function StudentAnalytics({
     chainId,
     refreshTrigger
   );
-  const { openPopup } = useTransactionPopup();
 
   const totalEarningsValue = metrics?.totalEarningsValue ?? 0;
 
@@ -72,7 +69,7 @@ export function StudentAnalytics({
     {
       label: "Total Staked",
       value: metrics?.totalStaked ?? "--",
-      icon: <img src="/images/pyusd.png" alt="PYUSD" className="w-8 h-8" />,
+      icon: <img src="/images/flow.png" alt="FLOW" className="w-8 h-8" />,
       color: "gray",
       description: "Across all exams",
     },
@@ -121,31 +118,11 @@ export function StudentAnalytics({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 bg-transparent rounded-md border border-transparent">
-        <img
-          src={BlockscoutLogo}
-          alt="Blockscout Logo"
-          className="w-8 h-8 object-contain"
-        />
-        <p className="text-lg text-gray-600 font-mono">
-          Analytics Powered by <span className="font-semibold">Blockscout</span>
-        </p>
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, i) => (
           <MetricCard key={i} {...stat} loading={isLoading} />
         ))}
-      </div>
-
-      <div className="flex mt-8">
-        <Button
-          className="border-2 border-black shadow-[4px_4px_0px_#000] flex items-center gap-2 bg-purple-500 hover:bg-purple-600 cursor-pointer text-white"
-          onClick={() => openPopup({ chainId, address: userAddress })}
-        >
-          <History className="w-4 h-4" />
-          View Transaction History
-        </Button>
       </div>
 
       {/* Win Rate Chart Section with Loader */}

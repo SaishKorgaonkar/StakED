@@ -133,7 +133,7 @@ const GradeExam: React.FC = () => {
 
     if (estimatedWinners.length === 0) {
       scenario = "Estimated: Nobody Meets Predictions";
-      distribution = `Estimated: All ${totalStaked.toFixed(3)} PYUSD goes to Staked Bank`;
+      distribution = `Estimated: All ${totalStaked.toFixed(3)} FLOW goes to Staked Bank`;
     } else if (estimatedWinners.length === grades.length) {
       scenario = "Estimated: Everyone Meets Predictions";
       distribution = "Estimated: Everyone gets their stake back (no redistribution)";
@@ -276,7 +276,7 @@ const GradeExam: React.FC = () => {
             <div className="flex items-center space-x-2">
               <DollarSign className="w-5 h-5 text-green-600" />
               <div>
-                <p className="font-semibold">{examInfo.blockchain?.totalStake || '0'} PYUSD</p>
+                <p className="font-semibold">{examInfo.blockchain?.totalStake || '0'} FLOW</p>
                 <p className="text-sm text-gray-600">Total staked</p>
               </div>
             </div>
@@ -352,8 +352,8 @@ const GradeExam: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-600">Winners: {preview.winners}/{preview.total}</p>
-                  <p className="text-sm text-gray-600">Total Staked: {preview.totalStaked} PYUSD</p>
-                  <p className="text-sm text-gray-600">Protocol Fee: {preview.protocolFee.toFixed(3)} PYUSD</p>
+                  <p className="text-sm text-gray-600">Total Staked: {preview.totalStaked} FLOW</p>
+                  <p className="text-sm text-gray-600">Protocol Fee: {preview.protocolFee.toFixed(3)} FLOW</p>
                 </div>
               </div>
             </div>
@@ -397,8 +397,8 @@ const GradeExam: React.FC = () => {
                 
                 <div className="space-y-1 text-sm">
                   <p>• Winners: {rewardPreview.winners}/{rewardPreview.total} students</p>
-                  <p>• Total Staked: {rewardPreview.totalStaked} PYUSD</p>
-                  <p>• Protocol Fee: {rewardPreview.protocolFee.toFixed(3)} PYUSD</p>
+                  <p>• Total Staked: {rewardPreview.totalStaked} FLOW</p>
+                  <p>• Protocol Fee: {rewardPreview.protocolFee.toFixed(3)} FLOW</p>
                 </div>
               </div>
 

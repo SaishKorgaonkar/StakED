@@ -192,29 +192,11 @@ export default function TransactionPage() {
     <div className="min-h-screen bg-[#F9F9F9] p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex items-center gap-3">
-          <img
-            src={BlockscoutLogo}
-            alt="Blockscout Logo"
-            className="w-10 h-10 object-contain"
-          />
           <div>
-            <h1 className="text-4xl sm:text-4xl font-extrabold text-gray-800 mb-2">
-              View <span className="text-green-500">Transactions</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold">
+              View <span className="text-[#00EF8B]">Transactions</span>
             </h1>
-            <p className="font-mono text-gray-600 text-md">
-              Powered By BlockScout
-            </p>
           </div>
-        </div>
-
-        <div className="flex mt-8">
-          <Button
-            className="border-2 border-black shadow-[4px_4px_0px_#000] flex items-center gap-2 bg-purple-500 hover:bg-purple-600 cursor-pointer text-white mb-5"
-            onClick={() => window.open("https://staked.cloud.blockscout.com", "_blank")}
-          >
-            <ExternalLink className="w-4 h-4"/>
-            View Explorer on Autoscout
-          </Button>
         </div>
 
 
@@ -295,14 +277,14 @@ export default function TransactionPage() {
                           </td>
                           <td className="px-4 py-4 border-b border-gray-200">
                             <div className="flex items-center space-x-2">
-                              <img src="/images/flow-logo.png" alt="FLOW" className="w-5 h-5" />
-                              <span>{stake.amount} FLOW</span>
+                              <img src="/images/flow.png" alt="FLOW" className="w-5 h-5" />
+                              {/* <span>{stake.amount} FLOW</span> */}
                             </div>
                           </td>
                           <td className="px-4 py-4 border-b border-gray-200">
                             <div className="flex items-center space-x-2">
-                              <img src="/images/flow-logo.png" alt="FLOW" className="w-5 h-5" />
-                              <span>{txn.reward} FLOW</span>
+                              <img src="/images/flow.png" alt="FLOW" className="w-5 h-5" />
+                              {/* <span>{txn.reward} FLOW</span> */}
                             </div>
                           </td>
                           <td className="px-4 py-3 font-bold">
