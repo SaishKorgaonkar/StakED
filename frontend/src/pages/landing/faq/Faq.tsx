@@ -31,19 +31,19 @@ const Faq = () => {
             {[
               {
                 id: "item-1",
-                question: "What is StakED?",
+                question: "What is PeerBet?",
                 answer:
-                  "StakED is a gamified platform where students can stake on their own academic or skill performance, and others can back them based on confidence in their success.",
+                  "PeerBet is a gamified platform where students can stake on their own academic or skill performance, and others can back them based on confidence in their success.",
               },
               {
                 id: "item-2",
                 question: "How does staking fit into education?",
                 answer:
-                  "StakED turns learning into a friendly, gamified challenge. It rewards confidence and improvement, encouraging students to study smarter and stay motivated.",
+                  "PeerBet turns learning into a friendly, gamified challenge. It rewards confidence and improvement, encouraging students to study smarter and stay motivated.",
               },
               {
                 id: "item-3",
-                question: "How do I get started with StakED?",
+                question: "How do I get started with PeerBet?",
                 answer:
                   "To get started, all you need is a MetaMask wallet. Once you sign up, you can join classes, place stakes, and track your progress. The platform makes it easy to participate and earn rewards.",
               },

@@ -337,7 +337,7 @@ const IntegratedCreateExam: React.FC = () => {
                   <p className="font-medium">Reward Rules:</p>
                   <ul className="text-xs space-y-1">
                     <li>🏆 <strong>Everyone passes:</strong> Everyone gets stake back</li>
-                    <li>❌ <strong>Nobody passes:</strong> Stakes → Staked Bank</li>
+                    <li>❌ <strong>Nobody passes:</strong> Stakes → PeerBet Bank</li>
                     <li>🎯 <strong>Mixed results:</strong> Winners take all</li>
                   </ul>
                 </div>

@@ -43,7 +43,8 @@ export default function LandingNavbar() {
           onClick={() => scrollToSection("home")}
         >
           <h1 className="text-2xl font-extrabold tracking-tight">
-            Stak<span className="text-[#FF4C4C]">E</span><span className="text-[#01a72a]">D</span>
+            Peer<span className="text-[#FF4C4C]">B</span><span className="text-blue-500">E</span>
+            <span className="text-[#01a72a]">T</span>
           </h1>
         </div>
 

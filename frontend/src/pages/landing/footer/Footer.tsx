@@ -9,7 +9,8 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <h3 className="text-2xl font-bold">
-                 Stak<span className="text-[#FF4C4C]">E</span><span className="text-[#01a72a]">D</span>
+                 Peer<span className="text-[#FF4C4C]">B</span><span className="text-blue-500">E</span>
+            <span className="text-[#01a72a]">T</span>
               </h3>
             </div>
             <p className="font-mono text-sm font-bold text-[#111]">

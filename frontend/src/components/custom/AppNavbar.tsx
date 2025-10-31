@@ -7,8 +7,8 @@ export const AppNavbar = () => {
         <SidebarTrigger className="p-2 border-2 border-black hover:scale-105 transition-transform bg-blue-500 text-white font-bold cursor-pointer" />
       </div>
       <h1 className="text-2xl font-extrabold tracking-tight">
-        Stak<span className="text-[#FF4C4C]">E</span>
-        <span className="text-[#01a72a]">D</span>
+       Peer<span className="text-[#FF4C4C]">B</span><span className="text-blue-500">E</span>
+            <span className="text-[#01a72a]">T</span>
       </h1>
     </header>
   );

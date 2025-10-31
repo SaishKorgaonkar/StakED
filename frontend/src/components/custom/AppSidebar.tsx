@@ -101,8 +101,8 @@ export const AppSidebar = () => {
       <SidebarHeader className="p-[2px] flex justify-center group-data-[state=collapsed]:p-[12px]">
         <h1 className="text-2xl tracking-tighter">
           <span className="hidden font-extrabold group-data-[state=expanded]:block">
-            Stak<span className="text-[#FF4C4C]">E</span>
-            <span className="text-[#01a72a]">D</span>
+            Peer<span className="text-[#FF4C4C]">B</span><span className="text-blue-500">E</span>
+            <span className="text-[#01a72a]">T</span>
           </span>
           <span className="hidden font-mono group-data-[state=expanded]:block text-sm text-gray-500">
             Student Confidence Market
