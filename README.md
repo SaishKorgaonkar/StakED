@@ -18,16 +18,30 @@ This creates powerful financial and social incentives for academic excellence wh
 
 ---
 
-## 🔥 Flow Forte Hacks Track Achievements
+## 🏆 Flow Hackathon Submission
 
-PeerBet was built specifically to leverage the power of the Flow network and its ecosystem, directly addressing the core hackathon tracks:
+### Project Evolution
 
-| Track | Achievement | Evidence |
-| :--- | :--- | :--- |
-| **Killer App** | A novel use case of DeFi principles (Prediction Markets) applied to the massive education sector, solving real-world accountability and motivation problems. | *Unique dApp logic demonstrated by `ExamStaking.sol` and `StakEDManager.sol`.* |
-| **Forte Actions / Flow EVM** | Core smart contract logic is deployed and operates on the **Flow EVM**, utilizing **WFLOW** as the staking token. Verifiers use a dedicated dashboard to trigger on-chain actions to create and grade exams. | *Integration with Flow EVM via web3 utilities and explicit deployment scripts for Flow.* |
-| **Existing Code Integration** | A seamless, full-stack architecture combines a modern frontend, a powerful backend API, and a robust on-chain contract system. The system uses a MongoDB backend to efficiently cache and query read-only blockchain data. | *The project utilizes React/Vite/Shadcn-UI for the frontend, a Node/Express/Mongoose backend and a Hardhat/Solidity smart contract layer.* |
-| **Dune Analytics** | The architecture includes dedicated API endpoints to serve data aggregated for Dune Analytics dashboards, enabling real-time performance tracking for exams, staking volume, and user win rates. | *Presence of `analyticsRoutes.js` and controllers for fetching analytics data demonstrate the intent for a Dune integration.* |
+PeerBet builds upon **Staked**, our existing production application that successfully implemented prediction markets for academic outcomes using PyUSD on Ethereum. For this hackathon, we've strategically migrated and enhanced our proven platform to leverage Flow EVM's superior performance and ecosystem benefits.
+
+### Why Flow EVM?
+
+**Migration Benefits:**
+- **Lower Transaction Costs**: Significantly reduced gas fees compared to Ethereum mainnet
+- **Faster Finality**: Near-instant transaction confirmation for better UX
+- **Native FLOW Integration**: Seamless use of FLOW tokens for staking mechanics
+- **Growing Ecosystem**: Access to Flow's expanding DeFi and gaming communities
+- **Developer Experience**: EVM compatibility allows us to leverage our existing Solidity expertise while gaining Flow's advantages
+
+### Technical Achievements
+
+| Category | Implementation | Impact |
+|----------|----------------|---------|
+| **Smart Contract Architecture** | Multi-contract system with `ExamStaking.sol`, `StudentRegistry.sol`, and `VerifierRegistry.sol` deployed on Flow EVM | Modular, upgradeable design enabling complex staking logic and role-based access control |
+| **Flow EVM Integration** | Native FLOW token support, custom RPC configuration, and Flow-specific transaction handling | Full compatibility with Flow ecosystem while maintaining EVM standards |
+| **Production-Ready Backend** | Node.js/Express API with MongoDB caching layer for efficient blockchain data querying | Sub-second response times for analytics and user dashboards |
+| **Modern Frontend** | React + TypeScript with Web3Auth integration for seamless wallet connection | Intuitive UX with keyless authentication lowering barriers to entry |
+| **Real-Time Analytics** | Blockscout API integration tracking staking volume, win rates, and earnings | Data-driven insights for users and platform metrics |
 
 ---
 
