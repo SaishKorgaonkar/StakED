@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import IntegratedStakeDialog from "@/components/custom/IntegratedStakeDialog";
 import { CircleLoader } from "@/components/ui/circle-loader";
-// import { useAnalytics } from "../../hooks/useAnalytics";
+import { useAnalytics } from "../../hooks/useAnalytics";
 import {
   Dialog,
   DialogContent,
@@ -60,15 +60,6 @@ const StatCard = ({ title, value, subtitle, loading = false, className = "" }: S
     </div>
   );
 };
-
-
-
-interface StakeInfo {
-  hasStaked: boolean;
-  totalStakeAmount: number;
-  averagePredictedGrade: number;
-  stakeCount: number;
-}
 
 export default function UpcomingTestsDashboard() {
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
