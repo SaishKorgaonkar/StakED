@@ -33,6 +33,46 @@ PeerBet builds upon **Staked**, our existing production application that success
 - **Growing Ecosystem**: Access to Flow's expanding DeFi and gaming communities
 - **Developer Experience**: EVM compatibility allows us to leverage our existing Solidity expertise while gaining Flow's advantages
 
+### Hackathon Tracks
+
+We're competing in three key tracks that align with PeerBet's strengths:
+
+#### 🎯 Killer App
+**Novel Application of Blockchain to Education**
+
+PeerBet applies DeFi prediction market mechanics to solve real-world problems in education—a massive, underserved sector for blockchain innovation. By combining:
+- **Financial incentives** (staking rewards)
+- **Social accountability** (peer engagement)
+- **Transparent verification** (on-chain grading)
+
+We create a unique "accountability-as-a-service" platform that transforms how students engage with academic goals. This isn't just another DeFi fork—it's a purposeful application addressing genuine motivation and engagement challenges in education.
+
+**Achievement**: Fully functional prediction market for academic outcomes with real staking, grading, and reward distribution on Flow EVM.
+
+#### ⚡ Forte Actions
+**Flow EVM On-Chain Interactions**
+
+PeerBet leverages Forte Actions through multiple on-chain operations:
+- **Verifier Dashboard**: Instructors trigger on-chain transactions to create exams, set candidates, and submit grades
+- **Student Staking**: Direct smart contract interactions for placing and managing stakes
+- **Automated Settlement**: Smart contracts autonomously distribute rewards based on verifier-submitted scores
+- **Claim Mechanism**: User-initiated transactions to withdraw winnings from the contract
+
+**Achievement**: Production-ready web interface enabling non-technical users (teachers and students) to perform complex Flow EVM transactions with intuitive UI/UX.
+
+#### 🔧 Existing Code Integration
+**Migration from Production Staked Platform**
+
+PeerBet demonstrates exceptional code integration by:
+- **Migrating** our battle-tested Staked platform from PyUSD/Ethereum to Flow EVM
+- **Maintaining** all core functionality while adapting to Flow's ecosystem
+- **Integrating** multiple systems: Solidity smart contracts + Node.js backend + React frontend + MongoDB caching
+- **Enhancing** with Flow-specific features like native FLOW token support and Blockscout analytics
+
+This isn't a hackathon prototype—it's a production application strategically enhanced for Flow EVM.
+
+**Achievement**: Seamless full-stack integration with proven product-market fit, now optimized for Flow's performance benefits.
+
 ### Technical Achievements
 
 | Category | Implementation | Impact |
