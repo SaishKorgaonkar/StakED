@@ -191,24 +191,15 @@ contract ExamStaking is Ownable, ReentrancyGuard, Pausable {
             revert("No winners - stakes sent to staked bank");
         }
         
-        // Check if user is a winner
-        bool isUserWinner = false;
-        for (uint256 i = 0; i < winners.length; i++) {
-            if (winners[i] == msg.sender) {
-                isUserWinner = true;
-                break;
-            }
-        }
+        // Check if user has any winning stakes (staked on winning candidates)
+        uint256 userWinnerStake = _getUserWinnerStake(e, msg.sender);
         
-        if (!isUserWinner) {
+        if (userWinnerStake == 0) {
             revert("User is not a winner");
         }
 
         // Calculate user's proportional reward
         (uint256 totalWinnerStake, uint256 totalLoserStake) = _calculateStakeTotals(e);
-        uint256 userWinnerStake = _getUserWinnerStake(e, msg.sender);
-        
-        require(userWinnerStake > 0, "No winning stake");
         
         uint256 finalAmount;
         if (totalLoserStake == 0) {

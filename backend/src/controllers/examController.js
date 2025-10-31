@@ -11,9 +11,9 @@ dotenv.config();
 // Contract configuration (Updated for Flow EVM Testnet - DEPLOYED!)
 // Flow EVM Contract Addresses (Updated with native FLOW - Proper checksums)
 const CONTRACT_ADDRESSES = {
-  EXAM_STAKING: process.env.EXAM_STAKING_ADDRESS || "0xEBE5a5Db823873CC209aF9FF717A0203e02F907F",
-  STUDENT_REGISTRY: process.env.STUDENT_REGISTRY_ADDRESS || "0xA8821F82012E467A8dD2362FE26F0d4A2F4B5D46",
-  VERIFIER_REGISTRY: process.env.VERIFIER_REGISTRY_ADDRESS || "0x63611Dd7ddFFFeD346EBE23af118F941Be8E2142",
+  EXAM_STAKING: process.env.EXAM_STAKING_ADDRESS || "0x13E8AB911feE19C12D4695bCF5DB8c7e629E973e",
+  STUDENT_REGISTRY: process.env.STUDENT_REGISTRY_ADDRESS || "0x41e25C6Fb14e94207FeCF3Ca15Ce5913187F48D3",
+  VERIFIER_REGISTRY: process.env.VERIFIER_REGISTRY_ADDRESS || "0xb5321A82130AE62A13e6EFbED5015be039f82A5F",
   // Legacy
   PYUSD: process.env.PYUSD_ADDRESS || "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9", // Legacy
 };
@@ -602,21 +602,31 @@ export const submitGrades = async (req, res) => {
     await exam.save();
 
     // 6. Update stake records in MongoDB
+    // For each graded student, check if they are a winner
+    // Then update ALL stakes placed ON that student
     for (const grade of grades) {
       const isWinner = await examContract.isWinner(examIdBytes, grade.studentAddress);
       
-      // Calculate reward amount based on staking logic
-      const stakes = await Stake.find({ 
+      console.log(`📊 Checking stakes for candidate ${grade.studentAddress}:`);
+      console.log(`   - Actual Score: ${grade.score}`);
+      console.log(`   - Is Winner: ${isWinner}`);
+      
+      // Find ALL stakes placed ON this candidate (not just by them)
+      const stakesOnCandidate = await Stake.find({ 
         exam: examId, 
         candidateAddress: grade.studentAddress.toLowerCase() 
-      });
+      }).populate('student', 'username walletAddress');
       
-      for (const stake of stakes) {
+      console.log(`   - Found ${stakesOnCandidate.length} stake(s) placed ON this candidate`);
+      
+      for (const stake of stakesOnCandidate) {
         let rewardAmount = 0;
         if (isWinner) {
           // Winner gets their stake back (1:1 ratio for passing students)
           rewardAmount = stake.stakeAmount;
         }
+        
+        console.log(`   - Updating stake by ${stake.student.username}: Winner=${isWinner}, Reward=${rewardAmount}`);
         
         await Stake.findByIdAndUpdate(stake._id, {
           actualScore: grade.score,
@@ -729,6 +739,16 @@ export const claimReward = async (req, res) => {
       student: userId,
       isWinner: true,
       isClaimed: false 
+    }).populate('exam').populate('class');
+
+    console.log(`📋 Found ${userStakes.length} claimable stake(s) for user ${userId}`);
+    userStakes.forEach((stake, idx) => {
+      console.log(`   Stake ${idx + 1}:`);
+      console.log(`      - Candidate: ${stake.candidateAddress}`);
+      console.log(`      - Stake Amount: ${stake.stakeAmount} FLOW`);
+      console.log(`      - Reward Amount: ${stake.rewardAmount} FLOW`);
+      console.log(`      - Predicted: ${stake.predictedMarks}, Actual: ${stake.actualScore}`);
+      console.log(`      - Is Winner: ${stake.isWinner}, Is Claimed: ${stake.isClaimed}`);
     });
 
     if (userStakes.length === 0) {
