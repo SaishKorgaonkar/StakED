@@ -12,8 +12,8 @@ export const useNotification = () => {
     if (!txHash) return;
 
     try {
-      // Step 1: Blockscout toast (official toast)
-      await blockscout.openTxToast("11155111", txHash);
+      // Step 1: Blockscout toast for Flow EVM Testnet (Chain ID: 545)
+      await blockscout.openTxToast("545", txHash);
 
       // Step 2: Browser notification with comment
       if ("Notification" in window) {
@@ -35,16 +35,16 @@ export const useNotification = () => {
     } catch (error) {
       console.error("Notification failed:", error);
 
-      // Step 3: Fallback - open in Etherscan
-      const url = `https://sepolia.etherscan.io/tx/${txHash}`;
+      // Step 3: Fallback - open in Flow EVM Testnet explorer
+      const url = `https://evm-testnet.flowscan.io/tx/${txHash}`;
       window.open(url, "_blank");
 
       // Show comment in fallback notification
       if ("Notification" in window && Notification.permission === "granted") {
         new Notification("Transaction Fallback", {
           body: comment
-            ? `${comment}\nOpened in Etherscan: ${txHash.slice(0, 6)}...${txHash.slice(-4)}`
-            : `Opened in Etherscan: ${txHash.slice(0, 6)}...${txHash.slice(-4)}`,
+            ? `${comment}\nOpened in FlowScan: ${txHash.slice(0, 6)}...${txHash.slice(-4)}`
+            : `Opened in FlowScan: ${txHash.slice(0, 6)}...${txHash.slice(-4)}`,
           icon: "/vite.svg",
         });
       }

@@ -111,7 +111,7 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
             decimals: 18
           },
           rpcUrls: ['https://testnet.evm.nodes.onflow.org'],
-          blockExplorerUrls: ['https://evm-testnet.flowscan.org']
+          blockExplorerUrls: ['https://evm-testnet.flowscan.io']
         }]
       });
 

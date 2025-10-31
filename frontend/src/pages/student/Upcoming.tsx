@@ -81,7 +81,11 @@ export default function UpcomingTestsDashboard() {
   const [analyticsRefreshTrigger, setAnalyticsRefreshTrigger] = useState(0);
 
   // Get analytics data
+<<<<<<< Updated upstream
   const { metrics } = useAnalytics(userWalletAddress, "11155111", analyticsRefreshTrigger);
+=======
+  const { analytics, loading: analyticsLoading } = useAnalytics(userWalletAddress, "545", analyticsRefreshTrigger);
+>>>>>>> Stashed changes
 
   const fetchStakeInfo = async (examId: string): Promise<StakeInfo> => {
     try {
@@ -328,27 +332,43 @@ export default function UpcomingTestsDashboard() {
                   <div className="grid grid-cols-2 gap-4 mb-8">
                     <StatCard 
                       title="Total Staked" 
+<<<<<<< Updated upstream
                       value={metrics?.totalStaked || "0 PYUSD"}
+=======
+                      value={analytics ? `${analytics.totalStaked} FLOW` : "0 FLOW"}
+>>>>>>> Stashed changes
                       subtitle="Across all tests"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Stakes Won/Lost" 
+<<<<<<< Updated upstream
                       value={`${metrics?.totalStakesWon || 0}/${metrics?.totalStakesLost || 0}`}
+=======
+                      value={analytics ? `${analytics.totalStakesWon}/${analytics.totalStakesLost}` : "0/0"}
+>>>>>>> Stashed changes
                       subtitle="Win/Loss ratio"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Win Rate" 
+<<<<<<< Updated upstream
                       value={`${metrics?.winRate || 0}%`}
+=======
+                      value={analytics ? `${analytics.winRate}%` : "0%"}
+>>>>>>> Stashed changes
                       subtitle="Success rate"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Total Earnings" 
+<<<<<<< Updated upstream
                       value={metrics?.totalEarnings || "0 PYUSD"}
+=======
+                      value={analytics ? `${analytics.totalEarnings} FLOW` : "0 FLOW"}
+>>>>>>> Stashed changes
                       subtitle="Net profit/loss"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                   </div>
                 </div>
