@@ -217,8 +217,8 @@ const Classmates = () => {
   // Create enhanced classmates with real analytics data
   const enhancedClassmates = classmates.map(classmate => {
     const analyticsData = analytics[classmate.walletAddress];
-    const totalStaked = analyticsData?.totalStaked || "0.00 PYUSD";
-    const numericStaked = parseFloat(totalStaked.replace(" PYUSD", "")) || 0;
+    const totalStaked = analyticsData?.totalStaked || "0.00 FLOW";
+    const numericStaked = parseFloat(totalStaked.replace(" FLOW", "")) || 0;
     const stakesWon = analyticsData?.totalStakesWon || 0;
     const stakesLost = analyticsData?.totalStakesLost || 0;
     
@@ -377,7 +377,7 @@ const Classmates = () => {
                   <div className="text-right">
                     <p className="text-xs font-bold text-gray-600 uppercase">TOTAL STAKED</p>
                     <p className="text-xl font-black text-gray-800">
-                      {student.stakes ? student.stakes.toFixed(2) : '0.00'} PYUSD
+                      {student.stakes ? student.stakes.toFixed(2) : '0.00'} FLOW
                     </p>
                     <p className="text-xs text-gray-500">{student.totalStakes} stakes</p>
                   </div>

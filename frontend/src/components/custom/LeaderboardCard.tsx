@@ -116,7 +116,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
               </div>
               <div className="bg-blue-200 border-4 border-black rounded-xl px-3 py-1 shadow-[2px_2px_0px_#000]">
                 <p className="text-xs font-bold text-gray-700 uppercase">Total Staked</p>
-                <p className="text-lg font-black text-gray-800">{stakes.toFixed(2)} PYUSD</p>
+                <p className="text-lg font-black text-gray-800">{stakes.toFixed(2)} FLOW</p>
               </div>
             </div>
             

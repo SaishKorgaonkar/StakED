@@ -175,7 +175,7 @@ export default function ManualClaim({ contractAddress, examId, onClose }: Manual
           totalStake += stake;
         }
 
-        setStatus(`Found stake: ${ethers.formatUnits(totalStake, 6)} PYUSD`);
+        setStatus(`Found stake: ${ethers.formatUnits(totalStake, 6)} FLOW`);
 
         if (totalStake === 0n) {
           throw new Error('No stake found for this exam');

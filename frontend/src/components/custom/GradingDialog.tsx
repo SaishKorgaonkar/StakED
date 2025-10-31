@@ -59,7 +59,7 @@ const GradingDialog: React.FC<GradingDialogProps> = ({
       setIsLoading(true);
       setSubmitMessage('Processing grades...');
 
-      setSubmitMessage('Submitting grades and distributing PYUSD rewards...');
+      setSubmitMessage('Submitting grades and distributing FLOW rewards...');
       const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
       const token = localStorage.getItem("token");
       const response = await fetch(`${API_BASE}/exams/submit-grades`, { 
@@ -85,7 +85,7 @@ const GradingDialog: React.FC<GradingDialogProps> = ({
       }
 
       // Backend handles both database and blockchain automatically
-      setSubmitMessage(`🎉 Success! ${result.scenario || 'Grades submitted'} - Winners: ${result.winners || 0}/${result.totalStudents || students.length}. PYUSD rewards distributed!`);
+      setSubmitMessage(`🎉 Success! ${result.scenario || 'Grades submitted'} - Winners: ${result.winners || 0}/${result.totalStudents || students.length}. FLOW rewards distributed!`);
 
       setTimeout(() => {
         onGraded?.();

@@ -136,7 +136,7 @@ export default function StakeDialog({
       
       notify({
         txHash: stakeTxReceipt.hash,
-        comment: `Staked ${amount} PYUSD on ${predictedScore}%`
+        comment: `Staked ${amount} FLOW on ${predictedScore}%`
       });
       console.log("Notification triggered for hash:", stakeTxReceipt.hash);
       
@@ -224,7 +224,7 @@ export default function StakeDialog({
 
               <div>
                 <Label className="uppercase text-xs font-bold text-gray-800 mb-2 block">
-                  Stake Amount (PYUSD)
+                  Stake Amount (FLOW)
                 </Label>
                 <Input
                   type="number"
@@ -237,7 +237,7 @@ export default function StakeDialog({
                       setAmount(value);
                     }
                   }}
-                  placeholder="Enter whole PYUSD amount (no decimals)"
+                  placeholder="Enter whole FLOW amount (no decimals)"
                   className="bg-white border-2 border-black px-3 py-3 text-base font-semibold"
                 />
               </div>
@@ -284,7 +284,7 @@ export default function StakeDialog({
                   disabled={isLoading || !amount || parseFloat(amount) <= 0 || !predictedScore}
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold"
                 >
-                  {isLoading ? "Processing..." : `Stake ${amount || "0"} PYUSD`}
+                  {isLoading ? "Processing..." : `Stake ${amount || "0"} FLOW`}
                 </Button>
               </div>
             </div>

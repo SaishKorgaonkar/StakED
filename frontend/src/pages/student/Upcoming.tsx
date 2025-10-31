@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import IntegratedStakeDialog from "@/components/custom/IntegratedStakeDialog";
 import { CircleLoader } from "@/components/ui/circle-loader";
-import { useAnalytics } from "../../hooks/useAnalytics";
+// import { useAnalytics } from "../../hooks/useAnalytics";
 import {
   Dialog,
   DialogContent,
