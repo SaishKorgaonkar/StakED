@@ -122,13 +122,6 @@ export function StudentAnalytics({
 
   return (
     <div className="space-y-6">
-      {/* Debug Info */}
-      <div className="bg-gray-100 border-2 border-gray-300 p-3 text-xs font-mono">
-        <div>🔧 Debug: userAddress = {userAddress || 'null'}</div>
-        <div>🔧 Debug: isLoading = {isLoading.toString()}</div>
-        <div>🔧 Debug: metrics = {JSON.stringify(metrics, null, 2)}</div>
-      </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, i) => (
           <MetricCard key={i} {...stat} loading={isLoading} />

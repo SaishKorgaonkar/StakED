@@ -7,7 +7,7 @@ async function checkMyStakes() {
   const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL!);
   
   // Current contract address from .env
-  const examStakingAddress = process.env.EXAM_STAKING_ADDRESS || "0x45E8E7F39cf0Dc903B7471C80e8AC61dab283B9A"; // Flow EVM
+  const examStakingAddress = process.env.EXAM_STAKING_ADDRESS || "0xEBE5a5Db823873CC209aF9FF717A0203e02F907F"; // Flow EVM
   
   // Your test addresses from .env
   const testStudent = "0xCD4D36e9b762c59C4475C7374924621800188cd9";
@@ -86,7 +86,7 @@ async function checkMyStakes() {
               console.log(`   📅 Date: ${timestamp.toLocaleString()}`);
               console.log(`   🎯 Exam ID: ${examId}`);
               console.log(`   👤 Candidate: ${candidate}`);
-              console.log(`   💰 Amount: ${ethers.formatUnits(amount, 6)} PYUSD`);
+              console.log(`   💰 Amount: ${ethers.formatUnits(amount, 18)} FLOW`);
               console.log(`   📊 Predicted Score: ${predictedScore}`);
               
               // Store for later analysis

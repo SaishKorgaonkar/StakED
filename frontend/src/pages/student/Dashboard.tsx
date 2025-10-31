@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Award, BookOpen, Wallet } from "lucide-react";
 import ManualClaim from "../../components/ManualClaim";
+import StudentAnalytics from "../../components/StudentAnalytics";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
@@ -57,13 +58,15 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState<string | null>(null);
   const [userName, setUserName] = useState("Student");
+  const [userWalletAddress, setUserWalletAddress] = useState<string>("");
   const [showManualClaim, setShowManualClaim] = useState(false);
   const [manualClaimData, setManualClaimData] = useState<{contractAddress: string; examId: string} | null>(null);
   const [showClaimSuccess, setShowClaimSuccess] = useState(false);
+  const [analyticsRefreshTrigger, setAnalyticsRefreshTrigger] = useState(0);
 
   useEffect(() => {
     window.updateAnalytics = () => {
-      // Analytics removed
+      setAnalyticsRefreshTrigger(prev => prev + 1);
     };
   }, []);
   
@@ -152,6 +155,8 @@ export default function StudentDashboard() {
           setShowClaimSuccess(false);
         }, 5000);
         
+        setAnalyticsRefreshTrigger(prev => prev + 1);
+        
         fetchClaimableStakes();
         fetchDashboardData(); 
       } else {
@@ -196,6 +201,7 @@ export default function StudentDashboard() {
             fullUserData: userData.user 
           });
           setUserName(currentUserName);
+          setUserWalletAddress(walletAddress);
           setJoinFormData(prev => ({ ...prev, studentName: currentUserName }));
         }
       } catch (error) {
@@ -325,6 +331,28 @@ export default function StudentDashboard() {
             Your StakED performance at a glance
           </p>
         </div>
+
+        {userWalletAddress && (
+          <div className="mb-8">
+            <div className="mb-4 flex justify-between items-center">
+              <h2 className="text-2xl font-extrabold text-gray-800">Performance Analytics</h2>
+              <button
+                onClick={() => {
+                  console.log("🔄 Manually refreshing analytics...");
+                  setAnalyticsRefreshTrigger(prev => prev + 1);
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 border-2 border-black shadow-[4px_4px_0px_#000] hover:translate-x-1 hover:translate-y-1 transition-transform text-sm"
+              >
+                🔄 Refresh Analytics
+              </button>
+            </div>
+            <StudentAnalytics 
+              userAddress={userWalletAddress} 
+              chainId="545" 
+              refreshTrigger={analyticsRefreshTrigger} 
+            />
+          </div>
+        )}
 
         {showClaimSuccess && (
           <div className="mb-8">

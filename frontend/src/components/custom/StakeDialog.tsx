@@ -24,7 +24,7 @@ interface StakeDialogProps {
 }
 
 const FLOW_TOKEN_ADDRESS = "0x0000000000000000000000010000000000000000"; // Native FLOW token
-const EXAM_STAKING_ADDRESS = "0x45E8E7F39cf0Dc903B7471C80e8AC61dab283B9A"; // Updated for Flow EVM
+const EXAM_STAKING_ADDRESS = import.meta.env.VITE_EXAM_STAKING_ADDRESS || "0xEBE5a5Db823873CC209aF9FF717A0203e02F907F";
 
 const FLOW_ABI = [
   "function approve(address spender, uint256 amount) external returns (bool)",
