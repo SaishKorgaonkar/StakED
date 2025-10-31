@@ -81,7 +81,7 @@ export default function UpcomingTestsDashboard() {
   const [analyticsRefreshTrigger, setAnalyticsRefreshTrigger] = useState(0);
 
   // Get analytics data
-  const metrics = "1";
+  const { analytics, loading: analyticsLoading } = useAnalytics(userWalletAddress, "545", analyticsRefreshTrigger);
 
   const fetchStakeInfo = async (examId: string): Promise<StakeInfo> => {
     try {
@@ -328,27 +328,27 @@ export default function UpcomingTestsDashboard() {
                   <div className="grid grid-cols-2 gap-4 mb-8">
                     <StatCard 
                       title="Total Staked" 
-                      value={metrics || "0 FLOW"}
+                      value={analytics ? `${analytics.totalStaked} FLOW` : "0 FLOW"}
                       subtitle="Across all tests"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Stakes Won/Lost" 
-                      value={`${metrics || 0}/${metrics || 0}`}
+                      value={analytics ? `${analytics.totalStakesWon}/${analytics.totalStakesLost}` : "0/0"}
                       subtitle="Win/Loss ratio"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Win Rate" 
-                      value={`${metrics || 0}%`}
+                      value={analytics ? `${analytics.winRate}%` : "0%"}
                       subtitle="Success rate"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Total Earnings" 
-                      value={metrics || "0 FLOW"}
+                      value={analytics ? `${analytics.totalEarnings} FLOW` : "0 FLOW"}
                       subtitle="Net profit/loss"
-                      loading={!userWalletAddress || !metrics}
+                      loading={!userWalletAddress || analyticsLoading}
                     />
                   </div>
                 </div>

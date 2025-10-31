@@ -8,6 +8,7 @@ import verifierRoutes from "./src/routes/verifierRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import stakeRoutes from "./src/routes/stakeRoutes.js";
 import examRoutes from "./src/routes/examRoutes.js";
+import analyticsRoutes from "./src/routes/analyticsRoutes.js";
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use("/api/verifier", verifierRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/stakes", stakeRoutes);
 app.use("/api/exams", examRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // Health check route
 app.get("/", (req, res) => {

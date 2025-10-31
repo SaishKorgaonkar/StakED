@@ -109,7 +109,7 @@ export default function TransactionPage() {
       }
 
       const response = await fetch(
-        `https://eth-sepolia.blockscout.com/api?module=account&action=txlist&address=${userWalletAddress}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc`
+        `https://evm-testnet.flowscan.io/api?module=account&action=txlist&address=${userWalletAddress}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc`
       );
 
       if (response.ok) {
@@ -137,13 +137,13 @@ export default function TransactionPage() {
 
   const getMethodName = (input: string): string => {
     const methodMap: { [key: string]: string } = {
-      "0x98e8d931": "stake",
+      "0x8c610c8d": "stake",
       "0x2e1a7d4d": "claim",
       "0x095ea7b3": "approve"
     };
 
     const methodId = input.slice(0, 10);
-    return methodMap[methodId] || "0x98e8d931";
+    return methodMap[methodId] || "contract";
   };
 
   const getTransactionDescription = (tx: RecentTransaction) => {
@@ -181,7 +181,7 @@ export default function TransactionPage() {
   };
 
   const openBlockScout = (txHash: string) => {
-    window.open(`https://eth-sepolia.blockscout.com/tx/${txHash}`, '_blank');
+    window.open(`https://evm-testnet.flowscan.io/tx/${txHash}`, '_blank');
   };
 
   const formatAddress = (address: string) => {

@@ -77,7 +77,7 @@ export const addFlowEVMToMetaMask = async (): Promise<void> => {
           decimals: 18,
         },
         rpcUrls: ['https://testnet.evm.nodes.onflow.org'],
-        blockExplorerUrls: ['https://evm-testnet.flowscan.org'],
+        blockExplorerUrls: ['https://evm-testnet.flowscan.io'],
       }],
     });
   } catch (error) {
