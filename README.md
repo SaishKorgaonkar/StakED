@@ -45,61 +45,168 @@ PeerBet builds upon **Staked**, our existing production application that success
 
 ---
 
-## ✨ Key Features
+## ✨ Core Features
 
-* **Peer-to-Peer Staking:** Students can stake a desired amount on a classmate's performance (e.g., predicting a score of 90/100) for any registered exam.
-* **Verifier System:** Designated Verifiers (e.g., teachers) can register classes and create exams.
-* **Decentralized Grading & Payout:** The Verifier submits the final score on-chain, and the smart contract automatically settles all peer stakes and distributes rewards to the winners.
-* **Student Analytics:** Detailed dashboard showing staking history, win rate, and total earned rewards to gamify the learning process.
-* **Secure Authentication:** Utilizes Web3Auth for seamless, keyless wallet connection to the Flow network.
+### For Students
+* **Peer-to-Peer Staking**: Stake FLOW tokens on classmates' exam performance with customizable amounts
+* **Comprehensive Analytics**: Real-time dashboard showing staking history, win rate, total earnings, and performance trends
+* **Transparent Payouts**: Automated, trustless reward distribution via smart contracts
+* **Social Engagement**: Leaderboards and classmate analytics to foster healthy competition
 
----
+### For Verifiers (Instructors)
+* **Class Management**: Create and manage multiple classes with registered students
+* **Exam Creation**: Deploy exam contracts with configurable parameters and candidate lists
+* **On-Chain Grading**: Submit final scores directly to the blockchain with automatic stake settlement
+* **Audit Trail**: Immutable record of all grades and stake distributions
 
-## 🛠️ Tech Stack
-
-### Smart Contracts (Flow EVM)
-* **Language:** Solidity
-* **Framework:** Hardhat
-* **Chain:** **Flow EVM** Testnet
-* **Key Contracts:** `ExamStaking.sol`, `StakEDManager.sol`, `VerifierRegistry.sol`
-
-### Backend (Data & API)
-* **Framework:** Node.js (Express)
-* **Database:** MongoDB (Mongoose)
-* **Web3:** Ethers.js (for transaction monitoring)
-
-### Frontend (User Interface)
-* **Framework:** React + Vite
-* **Styling:** Tailwind CSS + Shadcn UI
-* **Web3 Integration:** Wagmi, Web3Modal, Ethers.js
+### Technical Highlights
+* **Web3Auth Integration**: Passwordless, keyless wallet authentication for seamless onboarding
+* **Blockscout Integration**: Real transaction data from Flow EVM explorer for accurate analytics
+* **Gas Optimization**: Efficient contract design minimizing transaction costs
+* **Security**: Role-based access control, reentrancy guards, and comprehensive input validation
 
 ---
 
-## 🏃 Getting Started (Local Setup)
+## 🛠️ Technical Architecture
 
-To run **PeerBet** locally, please follow the setup steps in the respective directories.
+### Smart Contracts (Flow EVM Testnet)
+* **Language**: Solidity ^0.8.28
+* **Framework**: Hardhat
+* **Network**: Flow EVM Testnet (Chain ID: 545)
+* **Key Contracts**:
+  - `ExamStaking.sol`: Core staking and reward distribution logic
+  - `StudentRegistry.sol`: Student registration and verification
+  - `VerifierRegistry.sol`: Instructor authorization and management
 
-### 1. Smart Contracts
+### Backend API
+* **Runtime**: Node.js 18+
+* **Framework**: Express.js
+* **Database**: MongoDB with Mongoose ODM
+* **Web3**: Ethers.js v6 for blockchain interaction
+* **Caching**: MongoDB-based caching for Blockscout data
 
-1.  Navigate to the `contracts/` directory.
-2.  Install dependencies: `npm install`
-3.  Compile contracts: `npx hardhat compile`
-4.  Deploy to Flow EVM (ensure your environment is configured for a Flow EVM network):
-    ```bash
-    npx hardhat run scripts/deploy-flow.ts --network <FLOW_NETWORK>
-    # Note: Refer to contracts/scripts/deploy-flow.ts for deployment specifics.
-    ```
+### Frontend Application
+* **Framework**: React 18 + TypeScript
+* **Build Tool**: Vite
+* **Styling**: Tailwind CSS + Shadcn UI components
+* **Web3**: Web3Auth, Wagmi, Ethers.js
+* **State Management**: React hooks with context API
 
-### 2. Backend
+### Infrastructure
+* **RPC**: Flow EVM Testnet (`https://testnet.evm.nodes.onflow.org`)
+* **Explorer**: Flowscan Blockscout (`https://evm-testnet.flowscan.io`)
+* **Token**: Native FLOW token for all staking operations
 
-1.  Navigate to the `backend/` directory.
-2.  Install dependencies: `npm install`
-3.  Set up environment variables (e.g., `MONGO_URI`, contract addresses, `FLOW_EVM_RPC_URL`).
-4.  Run the server: `npm start`
+---
 
-### 3. Frontend
+## 🚀 Quick Start
 
-1.  Navigate to the `frontend/` directory.
-2.  Install dependencies: `npm install`
-3.  Set up environment variables (e.g., `VITE_BACKEND_URL`, contract ABIs/Addresses).
-4.  Run the development server: `npm run dev`
+### Prerequisites
+- Node.js 18+ and npm
+- MongoDB instance (local or cloud)
+- Flow EVM testnet FLOW tokens ([Get from faucet](https://testnet-faucet.onflow.org/))
+
+### 1. Smart Contract Deployment
+
+```bash
+cd contracts
+npm install
+npx hardhat compile
+
+# Deploy to Flow EVM Testnet
+npx hardhat run scripts/deploy-flow.ts --network flowTestnet
+```
+
+**Note**: Save the deployed contract addresses for backend/frontend configuration.
+
+### 2. Backend Setup
+
+```bash
+cd backend
+npm install
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your MongoDB URI and deployed contract addresses
+
+npm start
+# Server runs on http://localhost:5000
+```
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+npm install
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with backend URL and contract addresses
+
+npm run dev
+# App runs on http://localhost:5173
+```
+
+---
+
+## 📊 System Flow
+
+1. **Verifier Registration**: Instructor registers and gets authorized on-chain
+2. **Class Creation**: Verifier creates a class and adds students
+3. **Exam Setup**: Verifier deploys exam contract with candidate list and parameters
+4. **Staking Phase**: Students stake FLOW on predicted outcomes for candidates
+5. **Grading**: Verifier submits final scores on-chain
+6. **Settlement**: Smart contract automatically distributes rewards to winners
+7. **Claiming**: Winners claim their rewards to their wallets
+
+---
+
+## 🔐 Security Considerations
+
+- **Role-Based Access**: Only authorized verifiers can grade exams
+- **Reentrancy Protection**: All withdrawal functions use checks-effects-interactions pattern
+- **Input Validation**: Comprehensive validation on all user inputs and blockchain interactions
+- **Transparent Logic**: All staking and distribution logic is publicly auditable on-chain
+
+---
+
+## 🎓 Use Cases
+
+- **Academic Institutions**: Gamify classroom engagement and accountability
+- **Online Learning Platforms**: Add peer prediction markets to course completion
+- **Corporate Training**: Incentivize professional development programs
+- **Study Groups**: Create peer accountability mechanisms with financial stakes
+
+---
+
+## 🛣️ Roadmap
+
+- [ ] Multi-chain deployment (Flow mainnet, other EVMs)
+- [ ] Advanced prediction types (grade ranges, percentile predictions)
+- [ ] Social features (comments, stake explanations)
+- [ ] Mobile application (React Native)
+- [ ] Integration with learning management systems (LMS)
+
+---
+
+## 👥 Team
+
+Built with ❤️ for the Flow Hackathon
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🔗 Links
+
+- **Flow EVM Documentation**: [https://developers.flow.com/evm/](https://developers.flow.com/evm/)
+- **Deployed Contracts**: [See FLOW_EVM_DEPLOYMENT.md](./FLOW_EVM_DEPLOYMENT.md)
+- **Original Staked Project**: [Our production PyUSD implementation]
+
+---
+
+*PeerBet: Where education meets prediction markets on Flow EVM*
