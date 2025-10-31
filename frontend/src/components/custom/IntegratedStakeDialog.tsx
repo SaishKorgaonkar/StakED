@@ -418,7 +418,7 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="amount">Stake Amount (FLOW)
-                <img src="/images/flow-logo.png" alt="FLOW" className="w-4 h-4 inline ml-1" /></Label>
+                <img src="/images/flow.png" alt="FLOW" className="w-6 h-6 inline ml-1" /></Label>
               <div className="relative">
                 <Input
                   id="amount"
@@ -474,7 +474,7 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
               <Button
                 onClick={handleStake}
                 disabled={loading || !amount || parseFloat(amount) <= 0 || !predictedMarks || parseFloat(predictedMarks) < 40 || parseFloat(predictedMarks) > 100}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="flex-1 bg-[#00EF8B] hover:bg-[#07d47f] cursor-pointer"
               >
                 {loading ? "Processing..." : "Stake FLOW"}
               </Button>
@@ -486,7 +486,7 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
         return (
           <div className="space-y-4 text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-              <img src="/images/flow-logo.png" alt="FLOW" className="w-12 h-12" />
+              <img src="/images/flow.png" alt="FLOW" className="w-12 h-12" />
             </div>
             <h3 className="text-lg font-semibold">Confirm Stake</h3>
             <p className="text-gray-600">
@@ -500,7 +500,7 @@ const IntegratedStakeDialog: React.FC<IntegratedStakeDialogProps> = ({
               <Button
                 onClick={handleConfirmStake}
                 disabled={loading}
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-full bg-[#00EF8B] hover:bg-[#07d47f]"
               >
                 {loading ? "Processing..." : "Confirm Stake"}
               </Button>

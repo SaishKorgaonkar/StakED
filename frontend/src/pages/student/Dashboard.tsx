@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Award, BookOpen, Wallet } from "lucide-react";
 import ManualClaim from "../../components/ManualClaim";
-import { StudentAnalytics } from "../../components/StudentAnalytics";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
@@ -52,8 +51,6 @@ interface GroupedClaimableExam {
 }
 
 export default function StudentDashboard() {
-  const [userWalletAddress, setUserWalletAddress] = useState<string>("");
-  const [chainId] = useState<string>("545"); // Flow EVM Testnet
   const [classes, setClasses] = useState<Class[]>([]);
   const [claimableStakes, setClaimableStakes] = useState<ClaimableStake[]>([]);
   const [groupedClaimableExams, setGroupedClaimableExams] = useState<GroupedClaimableExam[]>([]);
@@ -63,11 +60,10 @@ export default function StudentDashboard() {
   const [showManualClaim, setShowManualClaim] = useState(false);
   const [manualClaimData, setManualClaimData] = useState<{contractAddress: string; examId: string} | null>(null);
   const [showClaimSuccess, setShowClaimSuccess] = useState(false);
-  const [analyticsRefreshTrigger, setAnalyticsRefreshTrigger] = useState(0);
 
   useEffect(() => {
     window.updateAnalytics = () => {
-      setAnalyticsRefreshTrigger(prev => prev + 1);
+      // Analytics removed
     };
   }, []);
   
@@ -156,8 +152,6 @@ export default function StudentDashboard() {
           setShowClaimSuccess(false);
         }, 5000);
         
-        setAnalyticsRefreshTrigger(prev => prev + 1);
-        
         fetchClaimableStakes();
         fetchDashboardData(); 
       } else {
@@ -188,7 +182,6 @@ export default function StudentDashboard() {
       }
 
       let currentUserName = "Student";
-      let walletAddress = "";
       try {
         const userResponse = await fetch(`${API_BASE}/users/profile`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -196,9 +189,13 @@ export default function StudentDashboard() {
         if (userResponse.ok) {
           const userData = await userResponse.json();
           currentUserName = userData.user?.username || "Student";
-          walletAddress = userData.user?.walletAddress || "";
+          const walletAddress = userData.user?.walletAddress || "";
+          console.log(`👤 User data loaded:`, { 
+            username: currentUserName, 
+            walletAddress: walletAddress,
+            fullUserData: userData.user 
+          });
           setUserName(currentUserName);
-          setUserWalletAddress(walletAddress);
           setJoinFormData(prev => ({ ...prev, studentName: currentUserName }));
         }
       } catch (error) {
@@ -328,12 +325,6 @@ export default function StudentDashboard() {
             Your StakED performance at a glance
           </p>
         </div>
-
-          {userWalletAddress && (
-            <div className="mb-8">
-              <StudentAnalytics userAddress={userWalletAddress} chainId={chainId} refreshTrigger={analyticsRefreshTrigger} />
-            </div>
-          )}
 
         {showClaimSuccess && (
           <div className="mb-8">

@@ -81,11 +81,7 @@ export default function UpcomingTestsDashboard() {
   const [analyticsRefreshTrigger, setAnalyticsRefreshTrigger] = useState(0);
 
   // Get analytics data
-<<<<<<< Updated upstream
-  const { metrics } = useAnalytics(userWalletAddress, "11155111", analyticsRefreshTrigger);
-=======
   const { analytics, loading: analyticsLoading } = useAnalytics(userWalletAddress, "545", analyticsRefreshTrigger);
->>>>>>> Stashed changes
 
   const fetchStakeInfo = async (examId: string): Promise<StakeInfo> => {
     try {
@@ -225,7 +221,7 @@ export default function UpcomingTestsDashboard() {
             <div className="mb-6 sm:mb-8">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold">
                 <span className="text-black">Upcoming</span>
-                <span className="text-green-500">Tests</span>
+                <span className="text-[#00EF8B]"> Tests</span>
               </h1>
               
               <p className="font-mono text-gray-600 mt-1 text-sm sm:text-base">Monitor your metrics. Make your move.</p>
@@ -283,7 +279,7 @@ export default function UpcomingTestsDashboard() {
                                     : 'bg-red-100 text-red-800'
                               }`}>
                                 {examStakeInfo[exam._id]?.hasStaked 
-                                  ? `Staked: ${examStakeInfo[exam._id].totalStakeAmount} PYUSD | Predicted Grade: ${examStakeInfo[exam._id].averagePredictedGrade}`
+                                  ? `Staked: ${examStakeInfo[exam._id].totalStakeAmount} FLOW | Predicted Grade: ${examStakeInfo[exam._id].averagePredictedGrade}`
                                   : exam.canStake 
                                     ? 'CAN STAKE' 
                                     : 'STAKING CLOSED'
@@ -332,41 +328,25 @@ export default function UpcomingTestsDashboard() {
                   <div className="grid grid-cols-2 gap-4 mb-8">
                     <StatCard 
                       title="Total Staked" 
-<<<<<<< Updated upstream
-                      value={metrics?.totalStaked || "0 PYUSD"}
-=======
                       value={analytics ? `${analytics.totalStaked} FLOW` : "0 FLOW"}
->>>>>>> Stashed changes
                       subtitle="Across all tests"
                       loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Stakes Won/Lost" 
-<<<<<<< Updated upstream
-                      value={`${metrics?.totalStakesWon || 0}/${metrics?.totalStakesLost || 0}`}
-=======
                       value={analytics ? `${analytics.totalStakesWon}/${analytics.totalStakesLost}` : "0/0"}
->>>>>>> Stashed changes
                       subtitle="Win/Loss ratio"
                       loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Win Rate" 
-<<<<<<< Updated upstream
-                      value={`${metrics?.winRate || 0}%`}
-=======
                       value={analytics ? `${analytics.winRate}%` : "0%"}
->>>>>>> Stashed changes
                       subtitle="Success rate"
                       loading={!userWalletAddress || analyticsLoading}
                     />
                     <StatCard 
                       title="Total Earnings" 
-<<<<<<< Updated upstream
-                      value={metrics?.totalEarnings || "0 PYUSD"}
-=======
                       value={analytics ? `${analytics.totalEarnings} FLOW` : "0 FLOW"}
->>>>>>> Stashed changes
                       subtitle="Net profit/loss"
                       loading={!userWalletAddress || analyticsLoading}
                     />
@@ -422,7 +402,7 @@ export default function UpcomingTestsDashboard() {
               
               {examStakeInfo[selectedExam._id]?.hasStaked && (
                 <div className="w-full py-3 sm:py-4 text-lg sm:text-xl mt-4 sm:mt-6 bg-gray-100 border-2 border-gray-400 text-gray-600 font-bold text-center">
-                  Already Staked: {examStakeInfo[selectedExam._id].totalStakeAmount} PYUSD
+                  Already Staked: {examStakeInfo[selectedExam._id].totalStakeAmount} FLOW
                   <br />
                   <span className="text-sm">Predicted Grade: {examStakeInfo[selectedExam._id].averagePredictedGrade}</span>
                 </div>
