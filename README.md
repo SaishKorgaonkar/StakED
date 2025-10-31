@@ -1,14 +1,20 @@
-# PeerBet: Decentralized Predictive Staking on Flow 🚀
+# PeerBet: Decentralized Academic Prediction Markets on Flow EVM 🚀
 
-> **The next-generation motivation layer for academic success, powered by the Flow EVM and Forte.**
+> **Transforming academic accountability through decentralized prediction markets, powered by Flow EVM.**
 
-## 💡 The Problem & The Solution
+## 💡 Problem Statement
 
-In traditional learning environments, peer pressure and accountability are often unstructured and unrewarded. **PeerBet** transforms this by creating a **decentralized prediction market** around academic outcomes (like exam scores, project completion, or performance milestones).
+Traditional educational environments lack structured peer accountability mechanisms and fail to leverage the motivational power of social and financial incentives. Students often struggle with self-motivation, and peers have no systematic way to support or engage with each other's academic goals.
 
-**PeerBet** allows students and peers to stake **WFLOW** on the results of their classmates (or themselves) in a specific academic event set by an authorized Verifier (e.g., a teacher/instructor).
+## 🎯 Our Solution
 
-When the Verifier sets the final score on the Flow EVM, the stakes are automatically settled, and rewards are distributed to the correct prediction pools. This creates a powerful, financial incentive for accountability and a dynamic, engaging prediction layer on top of education.
+**PeerBet** is a decentralized prediction market platform built on Flow EVM that gamifies academic achievement through peer-to-peer staking. Students can stake FLOW tokens on their classmates' exam performance, creating a transparent, trustless system where:
+
+- **Verifiers** (instructors/teachers) create and grade exams on-chain
+- **Students** stake on predicted outcomes for themselves or peers
+- **Smart contracts** automatically settle stakes and distribute rewards based on actual results
+
+This creates powerful financial and social incentives for academic excellence while maintaining full transparency and fairness through blockchain technology.
 
 ---
 
