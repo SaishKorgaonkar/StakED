@@ -171,7 +171,7 @@ const VerifierDashboard = () => {
           </h3>
         </div>
         <p className="text-sm font-medium text-gray-900">
-          You are a verified educator on the StakED platform. You can create exams, manage student batches,
+          You are a verified educator on the PeerBet platform. You can create exams, manage student batches,
           and validate results.
         </p>
       </div>

@@ -28,7 +28,7 @@ interface AnalyticsMetrics {
 }
 
 // Flow EVM Testnet Configuration
-const FLOW_EVM_TESTNET_API = "https://evm-testnet.flowscan.io/api";
+const FLOW_EVM_TESTNET_API = import.meta.env.VITE_BLOCKSCOUT_BASE_URL || "https://evm-testnet.flowscan.io/api";
 const EXAM_STAKING_ADDRESS = import.meta.env.VITE_EXAM_STAKING_ADDRESS;
 
 console.log(`🔧 Analytics config loaded:`, {

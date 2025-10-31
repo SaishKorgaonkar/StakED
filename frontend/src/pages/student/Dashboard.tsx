@@ -328,7 +328,7 @@ export default function StudentDashboard() {
             Welcome back, <span className="text-green-500">{userName}</span>
           </h1>
           <p className="font-mono text-gray-600 text-lg">
-            Your StakED performance at a glance
+            Your PeerBet performance at a glance
           </p>
         </div>
 
