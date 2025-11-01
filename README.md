@@ -12,7 +12,7 @@ When the Verifier sets the final score on the Flow EVM, the stakes are automatic
 
 ---
 
-## 🔥 Flow Forte Hacks Track Achievements
+## 🔥 Flow Forte Hacks Tracks
 
 PeerBet was built specifically to leverage the power of the Flow network and its ecosystem, directly addressing the core hackathon tracks:
 
@@ -20,7 +20,7 @@ PeerBet was built specifically to leverage the power of the Flow network and its
 | :--- | :--- | :--- |
 | **Killer App** | A novel use case of DeFi principles (Prediction Markets) applied to the massive education sector, solving real-world accountability and motivation problems. | *Unique dApp logic demonstrated by `ExamStaking.sol` and `StakEDManager.sol`.* |
 | **Forte Actions / Flow EVM** | Core smart contract logic is deployed and operates on the **Flow EVM**, utilizing **WFLOW** as the staking token. Verifiers use a dedicated dashboard to trigger on-chain actions to create and grade exams. | *Integration with Flow EVM via web3 utilities and explicit deployment scripts for Flow.* |
-| **Existing Code Integration** | A seamless, full-stack architecture combines a modern frontend, a powerful backend API, and a robust on-chain contract system. The system uses a MongoDB backend to efficiently cache and query read-only blockchain data. | *The project utilizes React/Vite/Shadcn-UI for the frontend, a Node/Express/Mongoose backend and a Hardhat/Solidity smart contract layer.* |
+| **Existing Code Integration** | PeerBet is an extended version of our original project, [**stakED**](https://stak-ed.vercel.app/), and is currently focused on the Flow network. It features a seamless, full-stack architecture that combines a modern frontend, a powerful backend API, and a robust on-chain contract system. The system uses a MongoDB backend to efficiently cache and query read-only blockchain data. | *The project utilizes React/Vite/Shadcn-UI for the frontend, a Node/Express/Mongoose backend and a Hardhat/Solidity smart contract layer.* |
 
 ---
 
