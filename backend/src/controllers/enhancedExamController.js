@@ -3,9 +3,9 @@
 
 import { ethers } from "ethers";
 
-// Contract addresses and ABI
-const EXAM_STAKING_ADDRESS = process.env.EXAM_STAKING_ADDRESS || "0xEBE5a5Db823873CC209aF9FF717A0203e02F907F"; // Flow EVM
-const VERIFIER_REGISTRY_ADDRESS = "0xea9DA664E4282B0ca32C14c154B28850d7b1bf51";
+// Contract addresses and ABI (Auto-claim only)
+const EXAM_STAKING_ADDRESS = process.env.EXAM_STAKING_ADDRESS || "0x63BA06361454f2E11C61d9C12a6450DD46de885e"; // Flow EVM
+const VERIFIER_REGISTRY_ADDRESS = process.env.VERIFIER_REGISTRY_ADDRESS || "0x992b241dF7b90E4F2b75371dCCe6BfB46aD40860";
 
 const EXAM_ABI = [
   "function createExam(bytes32 examId, address verifier, address[] candidates, uint64 stakeDeadline, uint16 feeBps) external"

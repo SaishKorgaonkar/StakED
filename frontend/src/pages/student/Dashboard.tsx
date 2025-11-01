@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Award, BookOpen, Wallet } from "lucide-react";
 import ManualClaim from "../../components/ManualClaim";
 import StudentAnalytics from "../../components/StudentAnalytics";
+import { AutoClaimToggle } from "../../components/custom/AutoClaimToggle";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
@@ -351,6 +352,13 @@ export default function StudentDashboard() {
               chainId="545" 
               refreshTrigger={analyticsRefreshTrigger} 
             />
+          </div>
+        )}
+
+        {/* Flow Forte Actions - Auto-Claim */}
+        {userWalletAddress && (
+          <div className="mb-8">
+            <AutoClaimToggle userAddress={userWalletAddress} />
           </div>
         )}
 

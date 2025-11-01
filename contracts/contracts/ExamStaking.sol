@@ -29,7 +29,14 @@ contract ExamStaking is Ownable, ReentrancyGuard, Pausable {
         mapping(address => uint256) predictedScores;            // Predicted scores before exam
     }
 
+    struct AutoClaimConfig {
+        bool enabled;
+        uint256 lastClaimTime;
+    }
+
     mapping(bytes32 => Exam) private exams; // examId → Exam
+    mapping(address => AutoClaimConfig) public autoClaimSettings;
+    mapping(address => bytes32[]) private userExams; // Track exams user participated in
 
     event ExamCreated(bytes32 indexed examId, address verifier, uint64 stakeDeadline, uint16 feeBps);
     event ExamCanceled(bytes32 indexed examId);
@@ -37,6 +44,9 @@ contract ExamStaking is Ownable, ReentrancyGuard, Pausable {
     event ExamFinalized(bytes32 indexed examId, address[] winners);
     event Claimed(bytes32 indexed examId, address indexed staker, uint256 payout);
     event FeesWithdrawn(bytes32 indexed examId, address indexed to, uint256 amount);
+    event AutoClaimEnabled(address indexed user);
+    event AutoClaimDisabled(address indexed user);
+    event AutoClaimed(address indexed user, bytes32[] examIds, uint256 totalAmount, uint256 timestamp, string claimedVia);
 
     constructor(
         address _verifierRegistry,
@@ -148,6 +158,9 @@ contract ExamStaking is Ownable, ReentrancyGuard, Pausable {
         e.totalStake += amount;
         e.totalOnCandidate[candidate] += amount;
         e.stakeOf[msg.sender][candidate] += amount;
+
+        // Track user participation for auto-compound
+        _trackUserExam(msg.sender, examId);
 
         emit Staked(examId, msg.sender, candidate, amount, predictedScore);
     }
@@ -405,4 +418,206 @@ contract ExamStaking is Ownable, ReentrancyGuard, Pausable {
         }
         return winners;
     }
+
+    // ========================================
+    // HELPER FUNCTIONS - PENDING REWARDS
+    // ========================================
+
+    /// @notice Get total pending (unclaimed) rewards for a user across all exams
+    /// @param user Address to check
+    /// @return total Total pending rewards in wei
+    function getPendingRewards(address user) public view returns (uint256 total) {
+        bytes32[] memory examIds = userExams[user];
+        
+        for (uint256 i = 0; i < examIds.length; i++) {
+            Exam storage e = exams[examIds[i]];
+            
+            // Only count finalized exams that user hasn't claimed
+            if (!e.finalized || e.hasClaimed[user] || e.canceled) {
+                continue;
+            }
+            
+            // Check if user has winning stakes
+            uint256 userWinnerStake = _getUserWinnerStake(e, user);
+            if (userWinnerStake == 0) {
+                continue;
+            }
+            
+            // Calculate claimable amount
+            (uint256 totalWinnerStake, uint256 totalLoserStake) = _calculateStakeTotals(e);
+            
+            uint256 finalAmount;
+            if (totalLoserStake == 0) {
+                finalAmount = userWinnerStake;
+            } else {
+                uint256 rewardShare = (userWinnerStake * totalLoserStake) / totalWinnerStake;
+                finalAmount = userWinnerStake + rewardShare;
+            }
+            
+            total += finalAmount;
+        }
+        
+        return total;
+    }
+
+    /// @notice Internal function to track user participation in exams
+    function _trackUserExam(address user, bytes32 examId) internal {
+        // Check if already tracked
+        bytes32[] storage userExamList = userExams[user];
+        for (uint256 i = 0; i < userExamList.length; i++) {
+            if (userExamList[i] == examId) {
+                return; // Already tracked
+            }
+        }
+        userExamList.push(examId);
+    }
+
+    // ========================================
+    // AUTO-CLAIM FUNCTIONS (FORTE ACTIONS)
+    // ========================================
+
+    /// @notice Enable auto-claim for the caller (claims all winnings automatically via Forte)
+    function enableAutoClaim() external {
+        autoClaimSettings[msg.sender] = AutoClaimConfig({
+            enabled: true,
+            lastClaimTime: block.timestamp
+        });
+        
+        emit AutoClaimEnabled(msg.sender);
+    }
+
+    /// @notice Disable auto-claim for the caller
+    function disableAutoClaim() external {
+        autoClaimSettings[msg.sender].enabled = false;
+        emit AutoClaimDisabled(msg.sender);
+    }
+
+    /// @notice Check if user has auto-claim enabled and has pending claims
+    /// @param user Address to check
+    /// @return hasPending Whether user has pending claims to auto-claim
+    function canAutoClaim(address user) public view returns (bool hasPending) {
+        AutoClaimConfig memory config = autoClaimSettings[user];
+        if (!config.enabled) return false;
+        
+        // Check if user has any unclaimed winnings
+        uint256 pending = getPendingRewards(user);
+        return pending > 0;
+    }
+
+    /// @notice Execute auto-claim for a user (called by Forte Actions or anyone)
+    /// @param user Address to auto-claim for
+    /// @dev This function can be called by anyone (Forte scheduler or keeper network)
+    function executeAutoClaim(address user) external nonReentrant {
+        require(autoClaimSettings[user].enabled, "Auto-claim not enabled");
+        
+        bytes32[] memory examIds = userExams[user];
+        bytes32[] memory claimedExamIds = new bytes32[](examIds.length);
+        uint256 claimedCount = 0;
+        uint256 totalClaimed = 0;
+
+        // Claim all available winnings
+        for (uint256 i = 0; i < examIds.length; i++) {
+            Exam storage e = exams[examIds[i]];
+            
+            // Skip if already claimed, not finalized, or canceled
+            if (e.hasClaimed[user] || !e.finalized || e.canceled) {
+                continue;
+            }
+
+            // Check if user has winning stakes
+            uint256 userWinnerStake = _getUserWinnerStake(e, user);
+            if (userWinnerStake == 0) {
+                continue;
+            }
+
+            // Calculate claimable amount
+            (uint256 totalWinnerStake, uint256 totalLoserStake) = _calculateStakeTotals(e);
+            
+            uint256 payout;
+            if (totalLoserStake == 0) {
+                // Everyone won - just return original stake
+                payout = userWinnerStake;
+            } else {
+                // Normal case: distribute loser stakes proportionally among winners
+                uint256 totalReward = totalLoserStake + totalWinnerStake - e.protocolFee;
+                payout = (totalReward * userWinnerStake) / totalWinnerStake;
+            }
+
+            if (payout > 0) {
+                e.hasClaimed[user] = true;
+                totalClaimed += payout;
+                claimedExamIds[claimedCount] = examIds[i];
+                claimedCount++;
+
+                emit Claimed(examIds[i], user, payout);
+            }
+        }
+
+        require(totalClaimed > 0, "Nothing to claim");
+
+        // Update last claim time
+        autoClaimSettings[user].lastClaimTime = block.timestamp;
+
+        // Transfer total claimed amount
+        (bool success, ) = payable(user).call{value: totalClaimed}("");
+        require(success, "Transfer failed");
+
+        // Emit auto-claim event with "Claimed via Flow Forte" message
+        bytes32[] memory finalClaimedIds = new bytes32[](claimedCount);
+        for (uint256 i = 0; i < claimedCount; i++) {
+            finalClaimedIds[i] = claimedExamIds[i];
+        }
+        
+        emit AutoClaimed(user, finalClaimedIds, totalClaimed, block.timestamp, "Claimed via Flow Forte");
+    }
+
+    /// @notice Get auto-claim settings for a user
+    /// @param user Address to check
+    /// @return enabled Whether auto-claim is enabled
+    /// @return lastClaimTime Timestamp of last auto-claim
+    function getAutoClaimSettings(address user) external view returns (
+        bool enabled,
+        uint256 lastClaimTime
+    ) {
+        AutoClaimConfig memory config = autoClaimSettings[user];
+        return (config.enabled, config.lastClaimTime);
+    }
+
+    /// @notice Get list of claimable exam IDs for a user
+    /// @param user Address to check
+    /// @return claimableExams Array of exam IDs that user can claim
+    function getClaimableExams(address user) external view returns (bytes32[] memory claimableExams) {
+        bytes32[] memory examIds = userExams[user];
+        uint256 claimableCount = 0;
+
+        // First pass: count claimable exams
+        for (uint256 i = 0; i < examIds.length; i++) {
+            Exam storage e = exams[examIds[i]];
+            
+            if (!e.hasClaimed[user] && e.finalized && !e.canceled) {
+                uint256 userWinnerStake = _getUserWinnerStake(e, user);
+                if (userWinnerStake > 0) {
+                    claimableCount++;
+                }
+            }
+        }
+
+        // Second pass: populate array
+        claimableExams = new bytes32[](claimableCount);
+        uint256 index = 0;
+        for (uint256 i = 0; i < examIds.length; i++) {
+            Exam storage e = exams[examIds[i]];
+            
+            if (!e.hasClaimed[user] && e.finalized && !e.canceled) {
+                uint256 userWinnerStake = _getUserWinnerStake(e, user);
+                if (userWinnerStake > 0) {
+                    claimableExams[index] = examIds[i];
+                    index++;
+                }
+            }
+        }
+
+        return claimableExams;
+    }
 }
+

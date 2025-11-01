@@ -8,12 +8,12 @@ import Stake from "../models/Stake.js";
 // Configure dotenv to ensure environment variables are loaded
 dotenv.config();
 
-// Contract configuration (Updated for Flow EVM Testnet - DEPLOYED!)
-// Flow EVM Contract Addresses (Updated with native FLOW - Proper checksums)
+// Contract configuration (Updated for Flow EVM Testnet - AUTO-CLAIM ONLY!)
+// Flow EVM Contract Addresses (Latest deployment with auto-claim feature)
 const CONTRACT_ADDRESSES = {
-  EXAM_STAKING: process.env.EXAM_STAKING_ADDRESS || "0x13E8AB911feE19C12D4695bCF5DB8c7e629E973e",
-  STUDENT_REGISTRY: process.env.STUDENT_REGISTRY_ADDRESS || "0x41e25C6Fb14e94207FeCF3Ca15Ce5913187F48D3",
-  VERIFIER_REGISTRY: process.env.VERIFIER_REGISTRY_ADDRESS || "0xb5321A82130AE62A13e6EFbED5015be039f82A5F",
+  EXAM_STAKING: process.env.EXAM_STAKING_ADDRESS || "0x63BA06361454f2E11C61d9C12a6450DD46de885e",
+  STUDENT_REGISTRY: process.env.STUDENT_REGISTRY_ADDRESS || "0x28E954fE0dfF7b2aB42276E196D65283F26d9A15",
+  VERIFIER_REGISTRY: process.env.VERIFIER_REGISTRY_ADDRESS || "0x992b241dF7b90E4F2b75371dCCe6BfB46aD40860",
   // Legacy
   PYUSD: process.env.PYUSD_ADDRESS || "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9", // Legacy
 };

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 interface ExamResult {
   exam: string;
   netReward: number;
+  status?: string;
 }
 
 interface WinRateDataPoint {
@@ -19,6 +20,7 @@ interface AnalyticsMetrics {
   totalStaked: string;
   totalStakesWon: number;
   totalStakesLost: number;
+  stakesPending?: number;
   winRate: number;
   totalEarnings: string;
   totalEarningsValue: number;
@@ -31,6 +33,11 @@ interface AnalyticsMetrics {
 const FLOW_EVM_TESTNET_API = import.meta.env.VITE_BLOCKSCOUT_BASE_URL || "https://evm-testnet.flowscan.io/api";
 const EXAM_STAKING_ADDRESS = import.meta.env.VITE_EXAM_STAKING_ADDRESS;
 
+// Function signatures for decoding
+const STAKE_SIGNATURE = "0x7b3b3ae8"; // stake(bytes32,address,uint256)
+const CLAIM_SIGNATURE = "0x379607f5"; // claim(bytes32)
+const REFUND_SIGNATURE = "0x7249fbb6"; // refund(bytes32,address)
+
 console.log(`🔧 Analytics config loaded:`, {
   FLOW_EVM_TESTNET_API,
   EXAM_STAKING_ADDRESS
@@ -40,6 +47,7 @@ const getMockAnalytics = (): AnalyticsMetrics => ({
   totalStaked: "0.0",
   totalStakesWon: 0,
   totalStakesLost: 0,
+  stakesPending: 0,
   winRate: 0,
   totalEarnings: "0.0",
   totalEarningsValue: 0,
@@ -87,8 +95,7 @@ const fetchFlowEVMTransactions = async (userAddress: string) => {
       
       // Filter for contract-related transactions
       const contractTxs = data.result.filter((tx: BlockscoutTransaction) => 
-        tx.to?.toLowerCase() === EXAM_STAKING_ADDRESS?.toLowerCase() || 
-        tx.from?.toLowerCase() === EXAM_STAKING_ADDRESS?.toLowerCase()
+        tx.to?.toLowerCase() === EXAM_STAKING_ADDRESS?.toLowerCase()
       );
       
       console.log(`🎯 Found ${contractTxs.length} contract transactions:`, contractTxs);
@@ -117,15 +124,17 @@ interface BlockscoutTransaction {
   isError: string;
 }
 
-const analyzeTransactions = (transactions: BlockscoutTransaction[]): AnalyticsMetrics => {
+const analyzeTransactions = (transactions: BlockscoutTransaction[], userAddress: string): AnalyticsMetrics => {
   let totalStaked = 0;
-  let totalEarnings = 0;
+  let totalWinnings = 0; // Money received from claims (wins)
+  let totalLosses = 0; // Money lost (stakes that got refunded or not claimed)
   let stakingTransactions = 0;
   let claimTransactions = 0;
+  let refundTransactions = 0;
   const examResults: ExamResult[] = [];
   const winRateHistory: WinRateDataPoint[] = [];
 
-  console.log(`📊 Analyzing ${transactions.length} transactions...`);
+  console.log(`📊 Analyzing ${transactions.length} transactions for ${userAddress}...`);
 
   if (transactions.length === 0) {
     console.log(`📊 No transactions found - returning zero analytics`);
@@ -133,6 +142,7 @@ const analyzeTransactions = (transactions: BlockscoutTransaction[]): AnalyticsMe
       totalStaked: "0.0000",
       totalStakesWon: 0,
       totalStakesLost: 0,
+      stakesPending: 0,
       winRate: 0,
       totalEarnings: "0.0000",
       totalEarningsValue: 0,
@@ -142,75 +152,138 @@ const analyzeTransactions = (transactions: BlockscoutTransaction[]): AnalyticsMe
     };
   }
 
+  // Track stake amounts per exam for accurate loss calculation
+  const stakesByExam = new Map<string, number>();
+  const claimedExams = new Set<string>();
+  const refundedExams = new Set<string>();
+
   transactions.forEach((tx, index) => {
+    const functionSig = tx.input?.slice(0, 10);
+    const value = parseFlowValue(tx.value);
+    
     console.log(`🔍 Analyzing transaction ${index + 1}:`, {
       hash: tx.hash,
       from: tx.from,
       to: tx.to,
-      value: tx.value,
-      input: tx.input?.slice(0, 10),
+      value: value,
+      functionSig,
       timestamp: tx.timeStamp
     });
 
-    const value = parseFlowValue(tx.value);
-    
-    // Outgoing transactions to contract (stakes)
-    if (tx.to?.toLowerCase() === EXAM_STAKING_ADDRESS?.toLowerCase()) {
-      // Any transaction to the contract with value is likely a stake
-      if (value > 0) {
-        totalStaked += value;
-        stakingTransactions++;
-        console.log(`📈 STAKE detected: ${value} FLOW (Hash: ${tx.hash})`);
+    // STAKE: User sends FLOW to contract
+    if (functionSig === STAKE_SIGNATURE && value > 0) {
+      totalStaked += value;
+      stakingTransactions++;
+      
+      // Extract examId from transaction input (first parameter after function sig)
+      try {
+        const examId = tx.input.slice(10, 74); // bytes32 examId
+        stakesByExam.set(examId, (stakesByExam.get(examId) || 0) + value);
+        console.log(`📈 STAKE detected: ${value} FLOW (ExamId: ${examId})`);
+      } catch {
+        console.log(`📈 STAKE detected: ${value} FLOW (couldn't extract examId)`);
       }
     }
     
-    // Incoming transactions from contract (claims/rewards)
-    if (tx.from?.toLowerCase() === EXAM_STAKING_ADDRESS?.toLowerCase()) {
-      if (value > 0) {
-        totalEarnings += value;
-        claimTransactions++;
-        console.log(`💰 CLAIM detected: ${value} FLOW (Hash: ${tx.hash})`);
+    // CLAIM: User successfully claims rewards (WIN!)
+    else if (functionSig === CLAIM_SIGNATURE) {
+      claimTransactions++;
+      
+      try {
+        const examId = tx.input.slice(10, 74); // bytes32 examId
+        claimedExams.add(examId);
+        
+        // The actual payout comes from internal transaction, but we can estimate
+        // For now, mark this exam as claimed (won)
+        console.log(`✅ CLAIM detected for ExamId: ${examId}`);
+      } catch {
+        console.log(`✅ CLAIM detected (couldn't extract examId)`);
+      }
+    }
+    
+    // REFUND: User gets stake back (LOSS - no profit)
+    else if (functionSig === REFUND_SIGNATURE) {
+      refundTransactions++;
+      
+      try {
+        const examId = tx.input.slice(10, 74); // bytes32 examId
+        refundedExams.add(examId);
+        console.log(`❌ REFUND detected for ExamId: ${examId}`);
+      } catch {
+        console.log(`❌ REFUND detected (couldn't extract examId)`);
       }
     }
   });
 
-  // Generate win rate history based on actual transaction dates
-  const stakeDates = transactions
-    .filter(tx => tx.to?.toLowerCase() === EXAM_STAKING_ADDRESS?.toLowerCase() && parseFlowValue(tx.value) > 0)
-    .map(tx => new Date(parseInt(tx.timeStamp) * 1000));
+  // Now fetch internal transactions to get actual claim amounts
+  // For simplicity, we'll estimate: 
+  // - Claims = wins (assume 2x return on average for demo)
+  // - Refunds = losses (stake lost)
+  // - Unclaimed stakes = pending losses
   
-  stakeDates.forEach((date, index) => {
-    const claimsUpToDate = claimTransactions; // Simplified for now
-    const stakesUpToDate = index + 1;
-    
-    winRateHistory.push({
-      date: date.toISOString().split('T')[0],
-      winRate: stakesUpToDate > 0 ? (claimsUpToDate / stakesUpToDate) * 100 : 0,
-      period: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      stakesWon: claimsUpToDate,
-      stakesTotal: stakesUpToDate,
-    });
+  // Calculate win/loss amounts
+  claimedExams.forEach(examId => {
+    const stakeAmount = stakesByExam.get(examId) || 0;
+    // Estimate winnings as stake amount (conservative - actual rewards vary)
+    // In reality, you'd need to fetch internal transactions or contract events
+    totalWinnings += stakeAmount; // This is just the stake back, actual winnings would be higher
   });
 
-  const netEarnings = totalEarnings - totalStaked;
+  refundedExams.forEach(examId => {
+    const stakeAmount = stakesByExam.get(examId) || 0;
+    totalLosses += stakeAmount;
+  });
+
+  // Calculate net earnings: (stakes back from claims) - (stakes lost to refunds/unclaimed)
+  // For accurate calculation, winnings from claims should be > original stake
+  // But without internal tx data, we use: claims are wins, refunds/unclaimed are losses
+  const netEarnings = totalWinnings - totalLosses;
+  const totalStakesLost = refundTransactions + (stakingTransactions - claimTransactions - refundTransactions);
   const winRate = stakingTransactions > 0 ? (claimTransactions / stakingTransactions) * 100 : 0;
 
-  console.log(`📊 REAL Analytics Summary:
-    - Total Staked: ${totalStaked} FLOW (${stakingTransactions} stake transactions)
-    - Total Claimed: ${totalEarnings} FLOW (${claimTransactions} claim transactions)
+  // Generate win rate history
+  const sortedTxs = [...transactions].sort((a, b) => 
+    parseInt(a.timeStamp) - parseInt(b.timeStamp)
+  );
+
+  let cumulativeWins = 0;
+  let cumulativeTotal = 0;
+
+  sortedTxs.forEach((tx) => {
+    const functionSig = tx.input?.slice(0, 10);
+    
+    if (functionSig === STAKE_SIGNATURE) {
+      cumulativeTotal++;
+      
+      const date = new Date(parseInt(tx.timeStamp) * 1000);
+      winRateHistory.push({
+        date: date.toISOString().split('T')[0],
+        winRate: cumulativeTotal > 0 ? (cumulativeWins / cumulativeTotal) * 100 : 0,
+        period: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        stakesWon: cumulativeWins,
+        stakesTotal: cumulativeTotal,
+      });
+    } else if (functionSig === CLAIM_SIGNATURE) {
+      cumulativeWins++;
+    }
+  });
+
+  console.log(`📊 ANALYTICS SUMMARY:
+    - Total Staked: ${totalStaked} FLOW (${stakingTransactions} stakes)
+    - Claims (Wins): ${claimTransactions}
+    - Refunds (Losses): ${refundTransactions}
     - Net Earnings: ${netEarnings} FLOW
-    - Win Rate: ${winRate}%
-    - Stakes Won: ${claimTransactions}
-    - Stakes Lost: ${Math.max(0, stakingTransactions - claimTransactions)}`);
+    - Win Rate: ${winRate.toFixed(2)}%`);
 
   return {
     totalStaked: totalStaked.toFixed(4),
     totalStakesWon: claimTransactions,
-    totalStakesLost: Math.max(0, stakingTransactions - claimTransactions),
+    totalStakesLost: totalStakesLost,
+    stakesPending: Math.max(0, stakingTransactions - claimTransactions - refundTransactions),
     winRate: Math.round(winRate * 100) / 100,
     totalEarnings: netEarnings.toFixed(4),
     totalEarningsValue: netEarnings,
-    classesJoined: 0, // This would need backend integration
+    classesJoined: 0,
     examResults,
     winRateHistory
   };
@@ -235,17 +308,16 @@ export const useAnalytics = (userAddress: string | null, chainId?: string, refre
       setError(null);
 
       try {
-        console.log(`🚀 Starting analytics fetch for ${userAddress} on chain ${chainId || '545'}`);
+        console.log(`🚀 Starting analytics fetch for ${userAddress}`);
         
         const transactions = await fetchFlowEVMTransactions(userAddress);
-        const analytics = analyzeTransactions(transactions);
+        const analyticsData = analyzeTransactions(transactions, userAddress);
         
-        console.log("📊 Analytics calculated:", analytics);
-        setAnalytics(analytics);
+        console.log("📊 Analytics calculated:", analyticsData);
+        setAnalytics(analyticsData);
       } catch (err) {
         console.error("❌ Analytics fetch failed:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch analytics");
-        // Fallback to mock data on error
         console.log("🔄 Falling back to mock analytics");
         setAnalytics(getMockAnalytics());
       } finally {
@@ -262,7 +334,6 @@ export const useAnalytics = (userAddress: string | null, chainId?: string, refre
     analytics, 
     loading, 
     error,
-    // Also provide the expected interface for StudentAnalytics component
     metrics: analytics,
     isLoading: loading
   };
