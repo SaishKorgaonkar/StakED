@@ -2,7 +2,7 @@
 
 **🔗 Live Project:** [stak-ed.vercel.app](https://stak-ed.vercel.app/)
 
-**▶️ Demo Video:** [![StakED Demo Thumbnail - Provide Public Image URL Here](YOUR_VIDEO_THUMBNAIL_IMAGE_URL_HERE)](https://drive.google.com/file/d/1l5fFu38E3DlQPauopqyF68TBT52AXokl/view?usp=drive_link)
+**▶️ Demo Video:** [StakED](https://drive.google.com/file/d/1l5fFu38E3DlQPauopqyF68TBT52AXokl/view?usp=drive_link)
 
 > **Leveraging Decentralized Intelligence and Blockchain to unlock peer accountability and academic performance across Africa.**
 
