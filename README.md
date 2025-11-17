@@ -1,4 +1,4 @@
-# StakED: Decentralized Predictive Staking for African Education 🌍
+# StakED: Decentralized Predictive Staking for Education 🌍
 
 **🔗 Live Project:** [stak-ed.vercel.app](https://stak-ed.vercel.app/)
 
