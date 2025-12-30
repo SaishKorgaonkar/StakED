@@ -1,93 +1,176 @@
-# StakED: Decentralized Predictive Staking for Education 🌍
+# StakED - The On-Chain Confidence Market 🏆
 
-**🔗 Live Project:** [stak-ed.vercel.app](https://stak-ed.vercel.app/)
+### Stake on Performance. Earn on Results.
 
-**▶️ Demo Video:** [StakED](https://drive.google.com/file/d/1l5fFu38E3DlQPauopqyF68TBT52AXokl/view?usp=drive_link)
+**StakED** is a decentralized, gamified platform that lets students stake on academic performance using **PayPal’s PYUSD stablecoin** and earn rewards based on real, verified results. It brings the transparency of **Blockscout**, the stability of **PYUSD**, and the reliability of **Hardhat 3** into one on-chain ecosystem that rewards learning through incentives.
 
-> **Leveraging Decentralized Intelligence and Blockchain to unlock peer accountability and academic performance across Africa.**
+---
 
-***
+## 🚀 Live Links
 
-## 💡 The Problem & The Solution
+- **Deployed:** [[staked.vercel.app](https://stak-ed.vercel.app/)]
+- **Autoscout Explorer:** [staked.cloud.blockscout.com](https://staked.cloud.blockscout.com/)
 
-In many emerging education sectors, particularly across Africa, structured peer-to-peer accountability is a significant barrier to student success. Traditional learning environments often lack formalized and incentivized mechanisms for peer motivation and outcome tracking.
+---
 
-**StakED** directly addresses this by creating a **decentralized prediction market** around key academic outcomes (like exam scores, project completion, or performance milestones).
+### 🚨 For Judging Access
 
-**StakED** allows students and peers to stake **Pyusd** on the results of their classmates (or themselves) in a specific academic event set by an authorized Verifier (e.g., a teacher/instructor).
+For the judging process, we’ve provided **verifier access** inside the app. One account only provides access to one dashboard.
+You will need **two MetaMask accounts**:
+- One to log in as a **student**
+- One to log in as a **verifier**
 
-When the Verifier sets the final score on the EVM, the stakes are automatically settled, and rewards are distributed to the correct prediction pools. This creates a powerful, transparent financial incentive for accountability, gamifying the learning process and driving student motivation across the continent.
+"Connect with metamask" button grants student access
+"Verifier access" button grants verifier access
 
-***
+Once logged in this cannot be changed. This ensures safety for the website
 
-## 🔥 Power Hacks 2025: AI & Blockchain Tracks
+ALSO MAKE SURE YOU HAVE PYUSD IN YOUR METAMASK ACCOUNT, THIS WILL BE ESSENTIAL IF YOU WANT TO STAKE
 
-StakED is designed as a foundational layer for decentralized education, directly aligning with the Power Hacks 2025 theme of **AI-Driven Agents & Blockchain**.
+A quick-access button for the **Verifier Dashboard** is available on the landing page for easy testing.
 
-| Track | Achievement | Evidence |
+---
+
+## 🧩 Partner Integrations
+
+Below are the hackathon partner tracks StakED integrates with — **PayPal (PYUSD)**, **Blockscout**, and **Hardhat 3**
+
+### 💠 **PayPal USD (PYUSD)**
+
+| Criteria | Description | How StakED Satisfies |
+|-----------|--------------|----------------------|
+| **About** | PayPal USD (PYUSD) is a stablecoin enabling secure digital paymentss. | StakED uses PYUSD as the **core staking and reward currency**, ensuring stable and transparent academic rewards. |
+| **Functionality** | How well does the project work technically? | Fully functional staking, claiming, and reward logic using `SafeERC20` transfers of PYUSD on Sepolia Testnet. |
+| **Payments Applicability** | How does it address real-world payment challenges? | PYUSD eliminates volatility, allowing students worldwide to earn real-value incentives for performance, bridging **DeFi** and **education**. |
+| **Novelty** | How unique is the concept? | StakED introduces an on-chain education staking platform that uses a stablecoin (PYUSD) to enable transparent, performance-based academic rewards. |
+| **UX** | Is the experience intuitive? | Clean ShadCN + Tailwind with a neo-brutalism styled interface with transparent staking flow and Blockscout-linked transaction views. |
+| **Open-Source** | Public and composable code? | 100% open-source on GitHub. |
+| **Business Plan** | Can this evolve into a viable business? | StakED can scale into a **learning incentive platform** for schools or edtechs using PYUSD-based micro-rewards to incentivze studying. |
+
+> 🧠 **In essence:** “PYUSD brings PayPal’s trust and stability into DeFi staking, finally making real-world, dollar-backed incentives possible for education.”
+
+---
+
+### 🟣 **Blockscout**
+
+| Criteria | Description | How StakED Satisfies |
+|-----------|--------------|----------------------|
+| **Autoscout Use** | Did we deploy a custom explorer? | Yes — [staked.cloud.blockscout.com](https://staked.cloud.blockscout.com) on Sepolia, tracking all contract transactions. |
+| **SDK Integration** | Did the app use Blockscout’s SDK meaningfully? | Yes — real-time transaction history, win-rate tracking, toast notifications, and on-chain analytics powered by the SDK & API (v2). |
+| **Transparency** | Are transactions verifiable? | All staking, claim, and exam interactions link directly to Blockscout explorer pages. |
+| **Originality** | How unique is the use case? | Combining education, staking, and on-chain analytics. |
+
+> 🔍 **“Blockscout makes StakED fully transparent — users can verify every stake, payout, and result.”**
+
+---
+
+### 🛠️ **Hardhat 3**
+
+| Criteria | Description | How StakED Satisfies |
+|-----------|--------------|----------------------|
+| **Version Compliance** | Uses Hardhat 3.0.0+? | Yes — explicitly built with v3 and its new compiler/runtime. |
+| **Testing** | Are tests implemented with Hardhat 3? | Yes — smart contract deployment and staking flow tested using Solidity test framework. |
+| **Performance** | Uses Hardhat’s new features? | Verified faster compile & local simulation with Hardhat Network. |
+| **Reliability** | Is Hardhat integral to the build process? | Entire contract lifecycle — from compilation to testnet deployment — runs through Hardhat scripts. |
+
+> 🧱 **“Every contract in StakED was built and validated with Hardhat 3 — ensuring stable, production-grade deployment.”**
+
+---
+
+## 🚀 Key Features
+
+| Feature | Description | On-Chain/Off-Chain |
 | :--- | :--- | :--- |
-| **Decentralized Intelligence** | Applying Prediction Markets (a core DeFi principle and form of decentralized intelligence) to the massive African EdTech sector, directly addressing accountability and motivation challenges critical for developmental education. | *Core dApp logic demonstrated by `ExamStaking.sol` and `StakEDManager.sol` defines the predictive market structure.* |
-| **Blockchain for Good (EdTech)** | Deploying transparent, immutable smart contract logic on a secure EVM network to foster trust and introduce financial literacy concepts using the **Pyusd** stablecoin as the reliable staking token. | *Deployed on **Sepolia Testnet**. Leverages standard web3 utilities and is verifiable via **Blockscout**.* |
-| **Scalable Full-Stack Architecture** | StakED features a seamless, full-stack architecture, combining a modern React/Vite/Shadcn-UI frontend, a powerful Node/Express/Mongoose backend (used to efficiently cache and query read-only blockchain data), and a robust Hardhat/Solidity smart contract layer. | *The project utilizes React/Vite/Shadcn-UI for the frontend, a Node/Express/Mongoose backend and a Hardhat/Solidity smart contract layer.* |
+| **Self-Staking** | Students lock tokens to bet on their own success (e.g., scoring $\ge 75\%$ on an exam). | Hybrid (Token Transfer $\rightarrow$ On-Chain Stake) |
+| **Peer Staking** | Students can stake on the expected performance of their classmates, creating a dynamic, peer-driven confidence market. | Hybrid (Token Transfer $\rightarrow$ On-Chain Stake) |
+| **Verifier Integrity** | Verifiers can create exams, set deadlines, and manage classes. The platform uses a **commit-reveal** process for grading to prevent results tampering. | On-Chain (Verifier Registry, Exam Management) |
+| **Prediction-Based Payout** | Winners are determined by accuracy: **actual score $\ge$ predicted score**. Forfeited stakes from losers are distributed among winning stakers. | On-Chain |
+| **PYUSD as Staking Token** | **PayPal USD (PYUSD)** is used as the base staking and reward token, providing a stable, regulated asset for financial incentives. | On-Chain |
 
-***
+---
 
-## ✨ Key Features
+## 🛠️ Technology Stack
 
-* **Peer-to-Peer Staking:** Students can stake a desired amount of **Pyusd** on a classmate's performance (e.g., predicting a score of 90/100) for any registered exam.
-* **Verifier System:** Designated Verifiers (e.g., teachers) can register classes and create exams.
-* **Decentralized Grading & Payout:** The Verifier submits the final score on-chain, and the smart contract automatically settles all peer stakes and distributes rewards to the winners.
-* **Student Analytics:** Detailed dashboard showing staking history, win rate, and total earned rewards to gamify the learning process.
-* **Secure Authentication:** Utilizes Web3Auth for seamless, keyless wallet connection.
+| Component | Technology | Description | Partner Integration |
+| :--- | :--- | :--- | :--- |
+| **Frontend** | **React**, **TypeScript**, **Vite**, ShadCN UI | Student and Verifier Dashboards | - |
+| **Backend (API)** | **Node.js**, **Express**, **MongoDB** | Off-chain data (user profiles, class/exam metadata), and API for the frontend | **🤖 Autoscout** - Transaction sync |
+| **Smart Contracts** | **Solidity** (`0.8.28`), **Hardhat v3** | Core logic for staking, prediction-based winner determination, and payout distribution | **⚒️ Hardhat** - Deployment & testing |
+| **Web3 Integration** | **Ethers.js** | Handles wallet connections, transaction signing, and contract calls | - |
+| **Analytics** | **Blockscout SDK** | Real-time blockchain analytics and transaction monitoring | **🔍 Blockscout** - Analytics integration |
+| **Payment Token** | **PayPal USD (PYUSD)** | Stable, regulated USD token for all staking and rewards | **💰 PayPal PYUSD** - Primary token |
 
-***
+---
 
-## 🛠️ Tech Stack
+## 🏗️ Smart Contract Architecture
 
-### Smart Contracts (EVM Compatible)
-* **Language:** Solidity
-* **Framework:** Hardhat
-* **Chain:** **Sepolia Testnet**
-* **Explorer:** **Blockscout**
-* **Key Contracts:** `ExamStaking.sol`, `StakEDManager.sol`, `VerifierRegistry.sol`
+The core functionality is managed by modular Solidity contracts, emphasizing separation of concerns for clarity and security.
 
-### Backend (Data & API)
-* **Framework:** Node.js (Express)
-* **Database:** MongoDB (Mongoose)
-* **Web3:** Ethers.js (for transaction monitoring)
+| Contract | Purpose | Key Roles |
+| :--- | :--- | :--- |
+| `ExamStaking.sol` | Main interaction point for staking, grading, and reward payout. | `Owner`, `Verifier`, `Student` |
+| `VerifierRegistry.sol` | Manages the list of authorized teacher/examiner wallet addresses. | `onlyAdmin`, `isVerifier` |
+| `StudentRegistry.sol` | Manages registration of student wallet addresses. | `onlyAdmin`, `isRegistered` |
 
-### Frontend (User Interface)
-* **Framework:** React + Vite
-* **Styling:** Tailwind CSS + Shadcn UI
-* **Web3 Integration:** Wagmi, Web3Modal, Ethers.js
+### Key Functions (in `ExamStaking.sol`)
 
-***
+| Function | Purpose | On-Chain Action |
+| :--- | :--- | :--- |
+| `stake(..., uint256 predictedScore)` | Transfers PYUSD and records the stake on-chain along with the expected score. | `pyusd.safeTransferFrom(msg.sender, address(this), amount)` |
+| `setStudentScores(..., uint256[] scores)` | **Verifier** submits final scores. The contract determines winners based on `actual_score >= predicted_score`. | Sets `e.actualScores` and `e.isWinner` |
+| `distributeRewards(bytes32 examId)` | Finalizes the exam and initiates the reward pool distribution logic. | Sets `e.finalized = true` |
+| `claim(bytes32 examId)` | Calculates and sends the appropriate reward (original stake + proportional share of loser pool) to the staker. | `pyusd.safeTransfer(msg.sender, finalAmount)` |
 
-## 🏃 Getting Started (Local Setup)
+---
 
-To run **StakED** locally, please follow the setup steps in the respective directories.
+## 🧑‍💻 Getting Started (Development)
 
-### 1. Smart Contracts
+The project is structured into three main directories: `contracts`, `backend`, and `frontend`.
 
-1.  Navigate to the `contracts/` directory.
-2.  Install dependencies: `npm install`
-3.  Compile contracts: `npx hardhat compile`
-4.  Deploy to Sepolia Testnet (ensure your environment is configured for the Sepolia network):
+### 1. Smart Contracts Setup (`contracts/`)
+
+1.  **Install Dependencies**:
     ```bash
-    npx hardhat run scripts/deploy-flow.ts --network sepolia
-    # Note: Refer to contracts/scripts/deploy-flow.ts for deployment specifics.
+    cd contracts
+    npm install
+    ```
+2.  **Configure**: Set up your `.env` file with your **Sepolia RPC URL** and private key for deployment.
+3.  **Deployment**: Deploy the core contracts, including `VerifierRegistry`, `StudentRegistry`, and `ExamStaking`, to the Sepolia testnet.
+    ```bash
+    npm run deploy:sepolia 
+    # Recommended: npm run deploy:final to use the final prediction-based contract
     ```
 
-### 2. Backend
+### 2. Backend Setup (`backend/`)
 
-1.  Navigate to the `backend/` directory.
-2.  Install dependencies: `npm install`
-3.  Set up environment variables (e.g., `MONGO_URI`, contract addresses, `EVM_RPC_URL` pointing to Sepolia).
-4.  Run the server: `npm start`
+1.  **Install Dependencies**:
+    ```bash
+    cd backend
+    npm install
+    ```
+2.  **Configure**: Create a `.env` file for **`MONGO_URI`**, `JWT_SECRET`, `PORT`, and your Sepolia RPC/Private Key.
+3.  **Run**: Start the API server.
+    ```bash
+    npm run dev
+    ```
 
-### 3. Frontend
+### 3. Frontend Setup (`frontend/`)
 
-1.  Navigate to the `frontend/` directory.
-2.  Install dependencies: `npm install`
-3.  Set up environment variables (e.g., `VITE_BACKEND_URL`, contract ABIs/Addresses).
-4.  Run the development server: `npm run dev`
+1.  **Install Dependencies**:
+    ```bash
+    cd frontend
+    npm install
+    ```
+2.  **Configure**: Update environment variables (`.env` file) with deployed contract addresses and the backend API URL.
+3.  **Run**: Start the React application.
+    ```bash
+    npm run dev
+    ```
+
+---
+
+
+## 🤖 Use of AI
+
+AI tools played a small but helpful role in building **StakED**, from improving the overall look and feel of the UI to refining the smart contracts and assisting in their connection.
+
